@@ -1,0 +1,1142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#140e07">
+<title>ਕੰਚੇ · Kanche — All-India Marbles Championship</title>
+<style>
+:root{--g:#ffd479;--gold-grad:linear-gradient(135deg,#fff3c4,#ffd479 45%,#d98a16);color-scheme:dark}
+html,body{height:100%;overflow:hidden;background:#0d0b07;color:#fff;user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+b{color:var(--g)}
+.glass{background:rgba(12,9,5,.62);border:1px solid rgba(255,212,121,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.fifa-bar{background:linear-gradient(90deg,rgba(14,11,7,.92),rgba(32,22,10,.94) 50%,rgba(14,11,7,.92));border:1px solid rgba(255,212,121,.38);box-shadow:0 8px 28px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.12)}
+#hud{padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left))}
+#jw{transition:.25s;opacity:0;transform:translateY(14px);pointer-events:none;height:0}
+#jw.on{opacity:1;transform:none;pointer-events:auto;height:auto}
+#jb{background:radial-gradient(circle,rgba(255,212,121,.16),rgba(0,0,0,.62) 70%);touch-action:none;box-shadow:0 0 0 6px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.65)}
+#jk{background:radial-gradient(circle at 35% 30%,#fff6d8,#ffc94a 45%,#b5761a)}
+#jp i{background:linear-gradient(90deg,#63d471,#ffd479 55%,#ff6b3d)}
+#modal{background:radial-gradient(ellipse at 50% 25%,rgba(68,42,12,.85),rgba(5,4,2,.97))}
+#modal.show{display:flex}
+.panel{touch-action:pan-y;background:linear-gradient(180deg,#261b0e,#120c06);box-shadow:0 24px 60px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,212,121,.18)}
+.btn{background:linear-gradient(180deg,#ffe9aa,#ffb830 55%,#dc840c);box-shadow:0 6px 20px rgba(224,138,16,.35);transition:transform .12s,filter .12s}
+.btn:active{transform:scale(.98);filter:brightness(.95)}
+.btn-ind{background:linear-gradient(135deg,#ff9933 0%,#ffd479 50%,#138808 100%);color:#120c05;box-shadow:0 6px 22px rgba(255,153,51,.3)}
+.opt.sel{background:linear-gradient(180deg,rgba(255,200,80,.32),rgba(255,150,30,.14));border-color:var(--g);color:#fff6d8}
+#flash{background:radial-gradient(circle at 50% 45%,rgba(255,225,140,.6),transparent 65%)}
+#flash.go{animation:fl .65s ease-out}@keyframes fl{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+#big{transform:translate(-50%,-50%);background:linear-gradient(180deg,#fff,#ffd479 45%,#ff8a3d);-webkit-background-clip:text;background-clip:text;color:transparent!important;filter:drop-shadow(0 6px 22px rgba(255,90,60,.6))}
+input{user-select:text;-webkit-user-select:text}
+#cine{background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.58)),linear-gradient(180deg,rgba(255,140,70,.16),transparent 35%,rgba(255,180,70,.12))}
+#cine::after{content:"";position:absolute;inset:0;opacity:.06;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
+#big.go{animation:bg 1.4s ease-out forwards}@keyframes bg{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%)}}
+.crest{display:inline-flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:.04em;border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 10px rgba(0,0,0,.4)}
+/* Custom scrollbar for tournament lists */
+.panel::-webkit-scrollbar{width:5px}
+.panel::-webkit-scrollbar-track{background:rgba(0,0,0,.25);border-radius:9px}
+.panel::-webkit-scrollbar-thumb{background:rgba(255,212,121,.35);border-radius:9px}
+</style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<canvas id="c" class="fixed inset-0 w-full h-full block"></canvas>
+<div id="cine" class="fixed inset-0 z-[4] pointer-events-none"></div>
+
+<!-- HUD Overlay -->
+<div id="hud" class="fixed inset-0 z-[5] pointer-events-none flex flex-col">
+  <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <b class="font-extrabold text-[15px] tracking-tight drop-shadow">ਕੰਚੇ KANCHE</b>
+      <span id="compBadge" class="hidden sm:inline-block text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/20 border border-amber-300/30 text-amber-200">VILLAGE</span>
+    </div>
+    <span id="elR" class="fifa-bar text-[11px] font-extrabold tracking-widest text-[#ffd479] px-3.5 py-1 rounded-full"></span>
+    <span class="flex gap-1.5 pointer-events-auto">
+      <button id="mute" class="glass w-[34px] h-[34px] rounded-full text-sm flex items-center justify-center" aria-label="Sound">🔊</button>
+      <button id="help" class="glass w-[34px] h-[34px] rounded-full font-extrabold text-[#ffd479] flex items-center justify-center" aria-label="How to play">?</button>
+    </span>
+  </div>
+
+  <!-- FIFA-Style Broadcast Match Scoreboard & Player Pills -->
+  <div id="pl" class="mt-2 flex flex-wrap items-center gap-1.5 max-w-[calc(100%-108px)]"></div>
+
+  <!-- Radar Minimap -->
+  <canvas id="mm" width="192" height="192" class="absolute right-2.5 top-[calc(52px+env(safe-area-inset-top))] w-24 h-24 rounded-full glass pointer-events-none shadow-xl"></canvas>
+
+  <!-- Live Commentary Banner -->
+  <div class="mt-auto flex justify-center pb-2">
+    <span id="stx" class="fifa-bar text-[12.5px] font-bold text-center rounded-2xl px-4 py-2 max-w-[min(92vw,480px)] leading-snug text-amber-100">Get ready…</span>
+  </div>
+
+  <!-- Single-Thumb Flick Joystick -->
+  <div id="jw" class="flex flex-col items-center gap-2">
+    <div id="jb" class="relative w-[148px] h-[148px] [@media(max-height:480px)]:w-28 [@media(max-height:480px)]:h-28 rounded-full border-2 border-amber-200/35 cursor-grab">
+      <div id="jk" class="absolute left-1/2 top-1/2 w-[60px] h-[60px] -ml-[30px] -mt-[30px] rounded-full pointer-events-none shadow-lg"></div>
+    </div>
+    <div id="jp" class="w-[130px] h-1.5 rounded-full bg-black/60 border border-amber-200/30 overflow-hidden"><i class="block h-full w-0"></i></div>
+  </div>
+</div>
+
+<div id="flash" class="fixed inset-0 z-[12] pointer-events-none opacity-0"></div>
+<div id="big" class="fixed left-1/2 top-[42%] z-[13] pointer-events-none opacity-0 text-[clamp(30px,10vw,60px)] font-black tracking-[.1em] text-[#ffd479] whitespace-nowrap"></div>
+
+<!-- Modal Dialog System -->
+<div id="modal" class="fixed inset-0 z-20 hidden items-center justify-center p-3 sm:p-4 backdrop-blur-md">
+  <div id="panel" class="panel w-[min(580px,100%)] max-h-[calc(100dvh-28px)] overflow-y-auto rounded-[22px] border border-amber-200/30 p-5"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const V=THREE.Vector3,mob=matchMedia('(pointer:coarse)').matches;
+const wait=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a),cl=(v,a,b)=>Math.min(b,Math.max(a,v));
+const G=32,FR=3.4,R=.15,HR=.8,HD=.8,HIT=.4,SK=.34,FDT=1/120;
+const PC=[0xffc94a,0xe8453c,0x2f7fe0,0x35b45c],PN=['You','Ravi','Jaspreet','Gurdeep'];
+const PAL=[0xe8453c,0x2f7fe0,0x35b45c,0xf2b134,0x9b4ddb,0x18b8b0,0xe86aa8,0xf4f1e6,0xff8a3d,0x6a7ce0];
+const hex=c=>'#'+c.toString(16).padStart(6,'0');
+
+/* ---------- All 28 Indian States Roster (Complete 15 + 13 Remaining States) ---------- */
+const STATES=[
+  {name:'Andhra Pradesh',code:'AP',c1:0xf59e0b,c2:0x1e3a8a,zone:'South'},
+  {name:'Arunachal Pradesh',code:'AR',code3:'ARU',c1:0x0284c7,c2:0xfacc15,zone:'North-East'},
+  {name:'Assam',code:'AS',code3:'ASM',c1:0xdc2626,c2:0xfef08a,zone:'North-East'},
+  {name:'Bihar',code:'BR',code3:'BIH',c1:0xea580c,c2:0x1d4ed8,zone:'East'},
+  {name:'Chhattisgarh',code:'CG',code3:'CHG',c1:0x16a34a,c2:0xfacc15,zone:'Central'},
+  {name:'Goa',code:'GA',code3:'GOA',c1:0x0ea5e9,c2:0xffffff,zone:'West'},
+  {name:'Gujarat',code:'GJ',code3:'GUJ',c1:0xf97316,c2:0xffffff,zone:'West'},
+  {name:'Haryana',code:'HR',code3:'HAR',c1:0x2563eb,c2:0xfbbf24,zone:'North'},
+  {name:'Himachal Pradesh',code:'HP',code3:'HIM',c1:0x059669,c2:0xef4444,zone:'North'},
+  {name:'Jharkhand',code:'JH',code3:'JHA',c1:0x15803d,c2:0xf59e0b,zone:'East'},
+  {name:'Karnataka',code:'KA',code3:'KAR',c1:0xeab308,c2:0xdc2626,zone:'South'},
+  {name:'Kerala',code:'KL',code3:'KER',c1:0x10b981,c2:0xfef3c7,zone:'South'},
+  {name:'Madhya Pradesh',code:'MP',code3:'MAP',c1:0xd97706,c2:0x7c2d12,zone:'Central'},
+  {name:'Maharashtra',code:'MH',code3:'MAH',c1:0xf97316,c2:0x1e293b,zone:'West'},
+  {name:'Manipur',code:'MN',code3:'MAN',c1:0xe11d48,c2:0xffffff,zone:'North-East'},
+  {name:'Meghalaya',code:'ML',code3:'MEG',c1:0x0d9488,c2:0xfde047,zone:'North-East'},
+  {name:'Mizoram',code:'MZ',code3:'MIZ',c1:0x3b82f6,c2:0xef4444,zone:'North-East'},
+  {name:'Nagaland',code:'NL',code3:'NAG',c1:0x111827,c2:0xef4444,zone:'North-East'},
+  {name:'Odisha',code:'OD',code3:'ODI',c1:0xb91c1c,c2:0xfacc15,zone:'East'},
+  {name:'Punjab',code:'PB',code3:'PUN',c1:0xff8a00,c2:0x1e3a8a,zone:'North'},
+  {name:'Rajasthan',code:'RJ',code3:'RAJ',c1:0xec4899,c2:0xfbbf24,zone:'West'},
+  {name:'Sikkim',code:'SK',code3:'SIK',c1:0xf59e0b,c2:0xdc2626,zone:'North-East'},
+  {name:'Tamil Nadu',code:'TN',code3:'TAM',c1:0x991b1b,c2:0xfbbf24,zone:'South'},
+  {name:'Telangana',code:'TG',code3:'TEL',c1:0xdb2777,c2:0x1e293b,zone:'South'},
+  {name:'Tripura',code:'TR',code3:'TRI',c1:0xea580c,c2:0x15803d,zone:'North-East'},
+  {name:'Uttar Pradesh',code:'UP',code3:'UTP',c1:0x1d4ed8,c2:0xf97316,zone:'North'},
+  {name:'Uttarakhand',code:'UK',code3:'UTK',c1:0x047857,c2:0xffffff,zone:'North'},
+  {name:'West Bengal',code:'WB',code3:'WBG',c1:0xf8fafc,c2:0x2563eb,zone:'East'}
+];
+const STATE_MAP=Object.fromEntries(STATES.map(s=>[s.name,s]));
+const stateObj=n=>STATE_MAP[n]||{name:n,code:n.slice(0,2).toUpperCase(),code3:n.slice(0,3).toUpperCase(),c1:0xffc94a,c2:0x1e293b,zone:'India'};
+const crestHTML=(n,sz='w-7 h-7 text-[10px]')=>{const s=stateObj(n);return `<span class="crest ${sz} shrink-0" style="background:linear-gradient(135deg,${hex(s.c1)} 52%,${hex(s.c2)} 52%);color:${s.c1===0xf8fafc?'#0f172a':'#fff'};text-shadow:0 1px 2px rgba(0,0,0,.85)">${s.code3||s.code}</span>`};
+
+/* ---------- Audio ---------- */
+let ac,lastSnd=0,muted=0;
+function snd(f,d,v,type='triangle'){
+  if(muted)return;
+  const n=performance.now();if(n-lastSnd<38)return;lastSnd=n;
+  try{
+    ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;
+    o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(t+d);
+  }catch(e){}
+}
+function fanfare(){
+  if(muted)return;
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>setTimeout(()=>{lastSnd=0;snd(f,.28,.12,'sine')},i*95));
+}
+
+/* ---------- Terrain ---------- */
+function gh(x,z){
+  let h=.055*Math.sin(x*.62+1.3)+.045*Math.cos(z*.71-.6)+.035*Math.sin((x+z)*.44+2.1);
+  const d=Math.hypot(x,z);
+  if(d<HR)h-=HD*(1-Math.pow(d/HR,1.8));
+  else if(d<HR*2.6)h+=.05*Math.sin(Math.PI*Math.min(1,(d-HR)/(HR*1.6)));
+  return h;
+}
+
+/* ---------- High-Quality Three.js Scene & Golden-Hour Courtyard ---------- */
+const ren=new THREE.WebGLRenderer({canvas:$('#c')[0],antialias:true,powerPreference:'high-performance'});
+ren.setPixelRatio(Math.min(devicePixelRatio||1,2));ren.setSize(innerWidth,innerHeight,false);
+ren.shadowMap.enabled=true;ren.shadowMap.type=THREE.PCFSoftShadowMap;
+ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.14;ren.outputEncoding=THREE.sRGBEncoding;
+
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0xe2cca2,.024);
+
+/* Rich Golden-Hour Sunset Sky Dome */
+(()=>{
+  const c=document.createElement('canvas');c.width=16;c.height=512;
+  const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,512);
+  [[0,'#285b9c'],[.28,'#5b9ad5'],[.52,'#b7d4e8'],[.72,'#f6d49b'],[.88,'#eaa85c'],[1,'#c98442']].forEach(s=>g.addColorStop(s[0],s[1]));
+  x.fillStyle=g;x.fillRect(0,0,16,512);
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;scene.background=t;
+})();
+
+scene.add(new THREE.HemisphereLight(0xfff0d4,0x6e4f2c,1.08));
+const sun=new THREE.DirectionalLight(0xffdca3,2.55);
+sun.castShadow=true;sun.shadow.mapSize.set(mob?1024:2048,mob?1024:2048);
+Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20,near:1,far:80});
+sun.shadow.bias=-.0005;sun.shadow.normalBias=.02;scene.add(sun,sun.target);
+
+/* Subtle rim backlight for glass marbles */
+const rimLight=new THREE.DirectionalLight(0x9ec5ff,.55);
+rimLight.position.set(-10,8,-14);scene.add(rimLight);
+
+/* Procedural Soil Albedo + Bump Map for Tactile Earth Texture */
+function groundTextures(){
+  const S=1024,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');
+  const bc=document.createElement('canvas');bc.width=bc.height=S;const bx=bc.getContext('2d');
+  x.fillStyle='#8c6c43';x.fillRect(0,0,S,S);
+  bx.fillStyle='#808080';bx.fillRect(0,0,S,S);
+  for(let i=0;i<26000;i++){
+    const px=Math.random()*S,py=Math.random()*S,pr=Math.random()*2.5+.4,hi=Math.random()>.48;
+    x.fillStyle=hi?`rgba(182,148,100,${.12+Math.random()*.2})`:`rgba(82,60,36,${.12+Math.random()*.22})`;
+    x.beginPath();x.arc(px,py,pr,0,6.3);x.fill();
+    bx.fillStyle=hi?'rgba(225,225,225,.24)':'rgba(35,35,35,.26)';
+    bx.beginPath();bx.arc(px,py,pr,0,6.3);bx.fill();
+  }
+  for(let i=0;i<280;i++){
+    const g=100+Math.random()*58;
+    x.fillStyle=`rgba(${g*.72|0},${g|0},${g*.42|0},${.06+Math.random()*.1})`;
+    x.beginPath();x.arc(Math.random()*S,Math.random()*S,Math.random()*36+8,0,6.3);x.fill();
+  }
+  const map=new THREE.CanvasTexture(c);map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(10,10);map.anisotropy=4;map.encoding=THREE.sRGBEncoding;
+  const bump=new THREE.CanvasTexture(bc);bump.wrapS=bump.wrapT=THREE.RepeatWrapping;bump.repeat.set(10,10);bump.anisotropy=4;
+  return{map,bump};
+}
+const gTex=groundTextures();
+const gMat=new THREE.MeshStandardMaterial({map:gTex.map,bumpMap:gTex.bump,bumpScale:.035,roughness:.94,metalness:.02});
+let gMesh=null;
+function buildGround(){
+  if(gMesh){scene.remove(gMesh);gMesh.geometry.dispose()}
+  const geo=new THREE.PlaneGeometry(52,52,mob?180:250,mob?180:250);geo.rotateX(-Math.PI/2);
+  const p=geo.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,gh(p.getX(i),p.getZ(i)));
+  geo.computeVertexNormals();
+  gMesh=new THREE.Mesh(geo,gMat);gMesh.receiveShadow=true;scene.add(gMesh);
+}
+
+/* Sculpted Pit Basin + Stone Rim + Throw Line Chalk */
+const holeDisc=new THREE.Mesh(new THREE.CircleGeometry(HR*.64,32).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x140d05,roughness:1}));
+holeDisc.position.y=-HD+.02;scene.add(holeDisc);
+
+const pitRim=new THREE.Mesh(new THREE.RingGeometry(HR*.85,HR*1.08,36).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x5c4226,roughness:.95,transparent:true,opacity:.65}));
+pitRim.position.y=.02;pitRim.receiveShadow=true;scene.add(pitRim);
+
+const throwLine=new THREE.Mesh(new THREE.PlaneGeometry(3.4,.08).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xfff3d1,transparent:true,opacity:.55}));
+scene.add(throwLine);
+
+/* ---------- Punjabi Village Courtyard Props (Trees, Charpai, Matka, Grass, Dust Motes) ---------- */
+const tG=new THREE.Group();scene.add(tG);
+const canopies=[];
+const trunkM=new THREE.MeshStandardMaterial({color:0x52361d,roughness:.96});
+const leafM=[0x2c5c27,0x3b7a30,0x244a20,0x498536].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.86,flatShading:true}));
+const trunkG=new THREE.CylinderGeometry(.28,.48,1,8),leafG=new THREE.IcosahedronGeometry(1,1);
+
+function tree(x,z,s){
+  const g=new THREE.Group(),h=3.3*s,t=new THREE.Mesh(trunkG,trunkM);
+  t.scale.set(s,h,s);t.position.y=h/2;t.castShadow=true;g.add(t);
+  const crown=new THREE.Group();crown.position.y=h;
+  for(let i=0;i<6;i++){
+    const l=new THREE.Mesh(leafG,leafM[i%4]);l.scale.setScalar(rnd(1.45,2.35)*s);
+    l.position.set(rnd(-1.6,1.6)*s,rnd(-.2,1.6)*s,rnd(-1.6,1.6)*s);l.castShadow=true;crown.add(l);
+  }
+  g.add(crown);canopies.push({crown,ph:rnd(0,6.28)});
+  g.position.set(x,gh(x,z),z);tG.add(g);
+}
+
+function buildCourtyardProps(D){
+  // Traditional Charpai (woven cot) on the side
+  const cp=new THREE.Group();
+  const wood=new THREE.MeshStandardMaterial({color:0x5c3818,roughness:.85});
+  const rope=new THREE.MeshStandardMaterial({color:0xd6b47c,roughness:.95});
+  const frame1=new THREE.Mesh(new THREE.BoxGeometry(2.3,.1,.1),wood);frame1.position.set(0,.48,-.52);
+  const frame2=new THREE.Mesh(new THREE.BoxGeometry(2.3,.1,.1),wood);frame2.position.set(0,.48,.52);
+  const frame3=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,1.14),wood);frame3.position.set(-1.1,.48,0);
+  const frame4=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,1.14),wood);frame4.position.set(1.1,.48,0);
+  const mat=new THREE.Mesh(new THREE.BoxGeometry(2.12,.05,.96),rope);mat.position.set(0,.49,0);mat.castShadow=true;
+  cp.add(frame1,frame2,frame3,frame4,mat);
+  [[-1.05,-.48],[1.05,-.48],[-1.05,.48],[1.05,.48]].forEach(([lx,lz])=>{
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.06,.05,.5,8),wood);leg.position.set(lx,.25,lz);leg.castShadow=true;cp.add(leg);
+  });
+  cp.position.set(-6.2,gh(-6.2,D*.35),D*.35);cp.rotation.y=.32;tG.add(cp);
+
+  // Clay Matka (Earthen Water Pot) beside the courtyard wall
+  const clay=new THREE.MeshStandardMaterial({color:0xa84b2b,roughness:.75});
+  const potBody=new THREE.Mesh(new THREE.SphereGeometry(.38,16,14),clay);potBody.position.y=.35;potBody.castShadow=true;
+  const potNeck=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,.18,14),clay);potNeck.position.y=.72;
+  const lid=new THREE.Mesh(new THREE.CylinderGeometry(.22,.18,.05,14),new THREE.MeshStandardMaterial({color:0xc96a44,roughness:.8}));lid.position.y=.82;
+  const matka=new THREE.Group();matka.add(potBody,potNeck,lid);
+  matka.position.set(5.4,gh(5.4,-2.4),-2.4);tG.add(matka);
+
+  // Grass tufts scattered around the mud ground
+  const grassM=new THREE.MeshStandardMaterial({color:0x4b7d2c,roughness:.9,flatShading:true});
+  const bladeG=new THREE.ConeGeometry(.07,.32,4);
+  for(let i=0;i<55;i++){
+    const gx=rnd(-13,13),gz=rnd(-8,D+5);
+    if(Math.abs(gx)<2.6&&gz>-1.5&&gz<D+1.5)continue; // Keep play lane clear
+    const tuft=new THREE.Group();
+    for(let b=0;b<3;b++){
+      const bl=new THREE.Mesh(bladeG,grassM);
+      bl.position.set(rnd(-.08,.08),.14,rnd(-.08,.08));
+      bl.rotation.set(rnd(-.3,.3),rnd(0,6),rnd(-.3,.3));
+      tuft.add(bl);
+    }
+    tuft.position.set(gx,gh(gx,gz),gz);tG.add(tuft);
+  }
+}
+
+function buildVillage(D){
+  tG.clear();canopies.length=0;
+  throwLine.position.set(0,gh(0,D)+.015,D);
+  for(let i=0;i<9;i++)tree(-18+i*4.5+rnd(-1,1),-7-rnd(0,6),rnd(1.15,1.75));
+  for(let i=0;i<6;i++){const z=-2+i*(D+8)/5;tree(-(9.2+rnd(0,4)),z,rnd(1.05,1.55));tree(9.2+rnd(0,4),z,rnd(1.05,1.55))}
+  const w=new THREE.Mesh(new THREE.BoxGeometry(46,1.65,.55),new THREE.MeshStandardMaterial({color:0xb88954,bumpMap:gTex.bump,bumpScale:.02,roughness:.96}));
+  w.position.set(0,.78,-18);w.receiveShadow=true;tG.add(w);
+  buildCourtyardProps(D);
+}
+
+/* Floating Golden Sunlight Dust Motes */
+const dustCount=120,dustGeo=new THREE.BufferGeometry(),dustPos=new Float32Array(dustCount*3);
+for(let i=0;i<dustCount;i++){dustPos[i*3]=rnd(-10,10);dustPos[i*3+1]=rnd(.3,4.5);dustPos[i*3+2]=rnd(-5,15)}
+dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
+const dustPts=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xffe6a3,size:.065,transparent:true,opacity:.45,depthWrite:false}));
+scene.add(dustPts);
+
+/* ---------- Glass Marbles with Swirl Cat's-Eye Core + Ground Contact Shadow ---------- */
+const mtc={};
+function mmat(col){
+  if(!mtc[col]){
+    const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+    x.fillStyle=hex(col);x.fillRect(0,0,128,128);
+    // Authentic glass cat's-eye ribbon swirl
+    x.lineWidth=11;x.strokeStyle='rgba(255,255,255,.82)';
+    for(let i=0;i<3;i++){x.beginPath();x.arc(rnd(16,112),rnd(16,112),rnd(24,56),rnd(0,6),rnd(0,6)+2.2);x.stroke()}
+    x.lineWidth=5;x.strokeStyle='rgba(255,245,190,.65)';
+    x.beginPath();x.moveTo(0,64);x.bezierCurveTo(42,20,86,108,128,64);x.stroke();
+    const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;
+    mtc[col]=new THREE.MeshPhysicalMaterial({map:t,roughness:.08,metalness:.04,clearcoat:1,clearcoatRoughness:.04,reflectivity:1});
+  }
+  return mtc[col];
+}
+const mGeo=new THREE.SphereGeometry(R,24,18),mGrp=new THREE.Group();scene.add(mGrp);
+const shGeo=new THREE.CircleGeometry(R*1.25,16).rotateX(-Math.PI/2);
+const shMat=new THREE.MeshBasicMaterial({color:0x120a03,transparent:true,opacity:.36,depthWrite:false});
+
+function mk(col){
+  const mesh=new THREE.Mesh(mGeo,mmat(col));mesh.castShadow=true;
+  const sh=new THREE.Mesh(shGeo,shMat);
+  mGrp.add(mesh,sh);
+  return{col,mesh,sh,pos:new V(),vel:new V(),inHole:false,frozen:true};
+}
+const kill=m=>{mGrp.remove(m.mesh);mGrp.remove(m.sh)};
+
+/* ---------- Game State ---------- */
+const S={phase:'setup',players:[],marbles:[],shot:null,target:null,hit:false,round:0,thrower:0,D:6,max:6,c:4,mode:'quick'};
+const maxSpeed=()=>3*Math.sqrt(S.D)+1.6,camBase=new V(),look=new V(),lookBase=new V();let fovK=0;
+const cam=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,200);
+
+function fitCamera(){
+  const D=S.D,a=innerWidth/innerHeight;let back=3.6+D*.78,up=2.35+D*.34;
+  if(a<1){const f=Math.pow(1/a,.62);back*=f;up*=f}
+  camBase.set(0,up,D+back);lookBase.set(0,.15,D*.4);look.copy(lookBase);cam.position.copy(camBase);cam.lookAt(look);
+  sun.target.position.set(0,0,D*.5);sun.target.updateMatrixWorld();sun.position.set(9,16,D*.5+8);
+}
+
+/* ---------- Physics (100% Preserved Core Mechanics) ---------- */
+function stepMarble(m,dt){
+  if(m.frozen){
+    m.sh.position.set(m.pos.x,gh(m.pos.x,m.pos.z)+.008,m.pos.z);
+    return;
+  }
+  const gy=gh(m.pos.x,m.pos.z)+R,dh=Math.hypot(m.pos.x,m.pos.z),hs=Math.hypot(m.vel.x,m.vel.z);
+  if(!m.inHole&&(m.pos.y<-.15||(dh<HR*.52&&hs<4.2)))m.inHole=true;
+  if(m.inHole)m.vel.multiplyScalar(Math.max(0,1-7*dt));
+  if(m.pos.y>gy+.004){
+    m.vel.y-=G*dt;m.pos.addScaledVector(m.vel,dt);
+    const g2=gh(m.pos.x,m.pos.z)+R;
+    if(m.pos.y<=g2){m.pos.y=g2;if(m.vel.y<0){m.vel.y=-m.vel.y*.34;if(m.vel.y<.55)m.vel.y=0}m.vel.x*=.87;m.vel.z*=.87}
+  }else{
+    m.pos.y=gy;if(m.vel.y<0)m.vel.y=0;
+    const e=.06,hx=(gh(m.pos.x+e,m.pos.z)-gh(m.pos.x-e,m.pos.z))/(2*e),hz=(gh(m.pos.x,m.pos.z+e)-gh(m.pos.x,m.pos.z-e))/(2*e);
+    m.vel.x-=G*hx*dt*SK;m.vel.z-=G*hz*dt*SK;
+    const sp=Math.hypot(m.vel.x,m.vel.z);
+    if(sp>1e-5){const k=Math.max(0,sp-FR*dt)/sp;m.vel.x*=k;m.vel.z*=k}
+    m.pos.x+=m.vel.x*dt;m.pos.z+=m.vel.z*dt;
+    const g3=gh(m.pos.x,m.pos.z)+R;if(m.pos.y<g3)m.pos.y=g3;
+  }
+  const s2=Math.hypot(m.vel.x,m.vel.z);
+  if(s2>.02){const ax=new V(m.vel.z,0,-m.vel.x).normalize();m.mesh.rotateOnWorldAxis(ax,s2*dt/R)}
+  m.mesh.position.copy(m.pos);
+  m.sh.position.set(m.pos.x,gh(m.pos.x,m.pos.z)+.008,m.pos.z);
+}
+function collide(a,b){
+  const dx=b.pos.x-a.pos.x,dz=b.pos.z-a.pos.z,md=2*R,d2=dx*dx+dz*dz;
+  if(d2>md*md||Math.abs(b.pos.y-a.pos.y)>md)return;
+  const d=Math.sqrt(d2)||1e-5,nx=dx/d,nz=dz/d,o=(md-d)/2;
+  a.pos.x-=nx*o;a.pos.z-=nz*o;b.pos.x+=nx*o;b.pos.z+=nz*o;
+  const df=(b.vel.x*nx+b.vel.z*nz)-(a.vel.x*nx+a.vel.z*nz);
+  if(Math.abs(df)>.5)snd(1300+rnd(0,600),.07,Math.min(.14,Math.abs(df)*.02));
+  a.vel.x+=df*nx;a.vel.z+=df*nz;b.vel.x-=df*nx;b.vel.z-=df*nz;
+}
+let acc=0;
+function physics(dt){
+  acc+=dt;let n=0;
+  while(acc>=FDT&&n<8){
+    acc-=FDT;n++;const L=S.marbles;
+    for(const m of L)stepMarble(m,FDT);
+    for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++)collide(L[i],L[j]);
+    if(S.phase==='shooting'&&S.target&&S.shot&&!S.hit&&Math.hypot(S.shot.pos.x-S.target.pos.x,S.shot.pos.z-S.target.pos.z)<HIT){
+      S.hit=true;flash();big('HIT!');snd(660,.25,.18);navigator.vibrate&&navigator.vibrate(60);fovK=1;
+    }
+  }
+  if(n>=8)acc=0;
+}
+function settle(max=5500){
+  return new Promise(res=>{const t0=performance.now();
+    const f=()=>{const mv=S.marbles.some(m=>!m.inHole&&(Math.hypot(m.vel.x,m.vel.z)>.28||Math.abs(m.vel.y)>.6));
+      if(!mv||performance.now()-t0>max)res();else requestAnimationFrame(f)};
+    requestAnimationFrame(f)});
+}
+
+/* ---------- FIFA-Style Broadcast HUD ---------- */
+const say=t=>$('#stx').text(t);
+const retrig=(s,c='go')=>{const e=$(s).removeClass(c);void e[0].offsetWidth;e.addClass(c)};
+const flash=()=>retrig('#flash'),big=t=>{$('#big').text(t);retrig('#big')};
+
+function hud(){
+  $('#elR').text(`RND ${Math.min(S.round,S.max)}/${S.max} · POT ${S.marbles.length}`);
+  const badge=$('#compBadge');
+  if(S.mode==='india'){badge.removeClass('hidden').text('🇮🇳 ALL-INDIA CHAMPIONSHIP')}
+  else if(S.mode==='district'){badge.removeClass('hidden').text('🏆 PUNJAB DISTRICT CUP')}
+  else{badge.addClass('hidden')}
+
+  // If 2-team tournament match (District or National), render authentic FIFA broadcast scoreboard bug
+  if((S.mode==='india'||S.mode==='district')&&S.players.length===2){
+    const [p0,p1]=S.players;
+    const s0=stateObj(p0.name),s1=stateObj(p1.name);
+    $('#pl').html(`
+      <div class="fifa-bar flex items-center rounded-xl overflow-hidden text-[12px] font-black shadow-xl">
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 transition ${S.thrower===0?'bg-amber-400/20':'opacity-75'}" style="border-left:4px solid ${hex(s0.c1)}">
+          <span class="text-white tracking-wider">${s0.code3||s0.code}</span>
+          <span class="px-1.5 py-0.5 rounded bg-black/60 text-[#ffd479] text-[13px]">${p0.marbles}</span>
+        </div>
+        <div class="px-2 py-1 text-[10px] font-extrabold text-amber-200/70 bg-black/50 border-x border-white/10">VS</div>
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 transition ${S.thrower===1?'bg-amber-400/20':'opacity-75'}" style="border-right:4px solid ${hex(s1.c1)}">
+          <span class="px-1.5 py-0.5 rounded bg-black/60 text-[#ffd479] text-[13px]">${p1.marbles}</span>
+          <span class="text-white tracking-wider">${s1.code3||s1.code}</span>
+        </div>
+      </div>
+    `);
+  }else{
+    $('#pl').html(S.players.map((p,i)=>`<div class="glass flex items-center gap-1.5 rounded-full py-1 pl-1.5 pr-2.5 text-[11px] font-bold transition ${i===S.thrower?'opacity-100 !border-[#ffd479] shadow-[0_0_14px_rgba(255,180,60,.35)]':'opacity-60'}"><i class="w-[9px] h-[9px] rounded-full" style="background:${hex(p.color)};box-shadow:0 0 8px ${hex(p.color)}"></i>${p.name}<b>${p.marbles}</b></div>`).join(''));
+  }
+}
+$('#mute').on('click',function(){muted=!muted;$(this).text(muted?'🔇':'🔊')});
+
+/* ---------- Aim Guide ---------- */
+const aimG=new THREE.BufferGeometry();aimG.setAttribute('position',new THREE.BufferAttribute(new Float32Array(27*3),3));
+const aimL=new THREE.Line(aimG,new THREE.LineDashedMaterial({color:0xffe066,dashSize:.16,gapSize:.1,depthTest:false,transparent:true}));
+aimL.frustumCulled=false;aimL.renderOrder=10;aimL.visible=false;scene.add(aimL);
+const ringM=r=>{const m=new THREE.Mesh(new THREE.RingGeometry(r,r*1.45,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffe066,transparent:true,opacity:.7,side:2,depthTest:false}));m.renderOrder=11;m.visible=false;scene.add(m);return m};
+const aimRing=ringM(.22),selRing=ringM(.25);selRing.material.color.set(0xff5a3c);
+
+/* ---------- Joystick ---------- */
+const J=$('#jb'),K=$('#jk'),PW=$('#jp i'),elJw=$('#jw')[0],jv={x:0,y:0};let joyOn=false,joyId=null;
+function joySet(e){
+  const r=J[0].getBoundingClientRect(),mx=r.width*.36;
+  let dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;const l=Math.hypot(dx,dy);
+  if(l>mx){dx*=mx/l;dy*=mx/l}
+  K.css('transform',`translate(${dx}px,${dy}px)`);jv.x=dx/mx;jv.y=dy/mx;PW.css('width',Math.min(1,Math.hypot(jv.x,jv.y))*100+'%');
+}
+const joyReset=()=>{jv.x=jv.y=0;K.css('transform','');PW.css('width',0)};
+J.on('pointerdown',e=>{if(S.phase!=='aim')return;e=e.originalEvent;e.preventDefault();joyOn=true;joyId=e.pointerId;try{J[0].setPointerCapture(joyId)}catch(_){}joySet(e)})
+ .on('pointermove',e=>{e=e.originalEvent;if(joyOn&&e.pointerId===joyId){e.preventDefault();joySet(e)}})
+ .on('pointerup pointercancel',e=>{e=e.originalEvent;if(!joyOn||e.pointerId!==joyId)return;joyOn=false;Math.hypot(jv.x,jv.y)>.1&&S.phase==='aim'?fire():joyReset()});
+
+function assist(o,dir){
+  let best=null,ba=.075;
+  for(const m of S.marbles){if(m===S.shot||m.inHole)continue;
+    const dx=m.pos.x-o.x,dz=m.pos.z-o.z,d=Math.hypot(dx,dz);if(d<.35)continue;
+    const a=Math.acos(cl((dx*dir.x+dz*dir.z)/d,-1,1));if(a<ba){ba=a;best=m}}
+  if(!best)return dir;
+  const dx=best.pos.x-o.x,dz=best.pos.z-o.z,d=Math.hypot(dx,dz);
+  return dir.clone().lerp(new V(dx/d,0,dz/d),.68).normalize();
+}
+function guide(){
+  const mag=Math.hypot(jv.x,jv.y);
+  if(S.phase!=='aim'||!S.shot||mag<.09){aimL.visible=aimRing.visible=false;return}
+  const o=S.shot.pos,dir=assist(o,new V(jv.x/mag,0,jv.y/mag)),sp=Math.min(1,mag)*maxSpeed(),tot=sp*sp/(2*FR),pa=aimG.attributes.position;
+  let ex=0,ey=0,ez=0;
+  for(let i=0;i<27;i++){const d=tot*i/26,x=o.x+dir.x*d,z=o.z+dir.z*d,y=gh(x,z)+.06;pa.setXYZ(i,x,y,z);ex=x;ey=y;ez=z}
+  pa.needsUpdate=true;aimL.computeLineDistances();aimL.visible=true;aimRing.position.set(ex,ey,ez);aimRing.visible=true;
+}
+
+/* ---------- Human Players (Dynamic State/District Jersey Colors) ---------- */
+const kids=[],SKIN=[0xc68642,0xa9713d,0xd9a066,0x8d5a2b],PAT=[0xff6a00,0x1f4fd8,0xf2f2f2,0x111111],SLOT=[[-2.2,0],[2.2,0],[-3.6,.6],[3.6,.6]];
+function kid(i,jerseyCol,turbanCol){
+  const g=new THREE.Group(),M=(c,r=.85)=>new THREE.MeshStandardMaterial({color:c,roughness:r}),
+   P=(geo,mat,x,y,z,par)=>{const p=new THREE.Mesh(geo,mat);p.position.set(x,y,z);p.castShadow=true;(par||g).add(p)},
+   piv=(x,y,z,par)=>{const q=new THREE.Group();q.position.set(x,y,z);(par||g).add(q);return q};
+  const legs=[-1,1].map(s=>{const q=piv(s*.13,.6,0);P(new THREE.CylinderGeometry(.09,.075,.6,8),M(0x233054),0,-.3,0,q);return q});
+  const body=piv(0,.6,0);
+  P(new THREE.CylinderGeometry(.19,.16,.6,10),M(jerseyCol||PC[i]),0,.32,0,body);
+  P(new THREE.SphereGeometry(.16,14,12),M(SKIN[i%4],.6),0,.78,0,body);
+  P(new THREE.SphereGeometry(.17,12,8,0,6.3,0,1.45),M(turbanCol||PAT[i%4]),0,.8,0,body);
+  const arms=[-1,1].map(s=>{const q=piv(s*.24,.56,0,body);P(new THREE.CylinderGeometry(.05,.045,.46,8),M(SKIN[i%4],.6),0,-.23,0,q);return q});
+  g.scale.setScalar(1.7);scene.add(g);
+  return{g,legs,body,arms,x:0,z:0,yaw:0,flick:0,cr:0,i};
+}
+function spawnKids(){
+  kids.forEach(k=>scene.remove(k.g));kids.length=0;
+  S.players.forEach((p,i)=>{
+    const st=STATE_MAP[p.name];
+    const jCol=st?st.c1:p.color;
+    const tCol=st?st.c2:PAT[i%4];
+    const k=kid(i,jCol,tCol);
+    k.x=SLOT[i][0]*1.5;k.z=S.D+9+i;kids.push(k);
+  });
+}
+let prevPh='';
+function animKids(t,dt){
+  const fl=prevPh!=='shooting'&&S.phase==='shooting';prevPh=S.phase;
+  kids.forEach((k,i)=>{
+    const th=i===S.thrower,aim=th&&(S.phase==='aim'||S.phase==='shooting'),win=th&&S.phase==='resolve'&&S.hit;
+    const tx=aim?-.95:SLOT[i][0],tz=S.D+(aim?.5:.4+SLOT[i][1]),dx=tx-k.x,dz=tz-k.z,d=Math.hypot(dx,dz),mv=d>.05;
+    if(mv){const st=Math.min(d,2.4*dt);k.x+=dx/d*st;k.z+=dz/d*st}
+    const ly=aim?S.D:0,ty=mv?Math.atan2(-dx,-dz):Math.atan2(k.x,k.z-ly);
+    k.yaw+=(((ty-k.yaw+Math.PI)%6.2832+6.2832)%6.2832-Math.PI)*Math.min(1,dt*8);
+    k.cr+=((aim&&!mv?1:0)-k.cr)*Math.min(1,dt*6);
+    if(fl&&th)k.flick=1;k.flick=Math.max(0,k.flick-dt*3.5);
+    const sw=mv?Math.sin(t*10)*.7:0,c=k.cr;
+    k.legs[0].rotation.x=sw+1.1*c;k.legs[1].rotation.x=-sw+1.1*c;
+    k.body.rotation.x=win?0:-.8*c;k.body.position.y=.6+Math.sin(t*2+i)*.012;
+    k.arms[0].rotation.x=win?3:-sw*.8+.9*c;
+    k.arms[1].rotation.x=win?3:sw*.8+1.5*c+.5*Math.sin(k.flick*Math.PI);
+    k.g.position.set(k.x,gh(k.x,k.z)-.5*c+(win?Math.abs(Math.sin(t*9))*.5:0),k.z);k.g.rotation.y=k.yaw;
+  });
+}
+
+/* ---------- Radar Minimap ---------- */
+const rc=$('#mm')[0].getContext('2d');
+function radar(){
+  const W=192,c=W/2,sc=W*.8/(S.D+3),X=x=>c+x*sc,Z=z=>c+(z-S.D/2)*sc;
+  rc.clearRect(0,0,W,W);rc.save();rc.beginPath();rc.arc(c,c,c-2,0,6.3);rc.clip();
+  rc.fillStyle='rgba(75,54,28,.88)';rc.fillRect(0,0,W,W);
+  rc.fillStyle='#120b04';rc.beginPath();rc.arc(X(0),Z(0),HR*sc,0,6.3);rc.fill();
+  rc.strokeStyle='rgba(255,212,121,.65)';rc.lineWidth=2;rc.beginPath();rc.moveTo(X(-1.5),Z(S.D));rc.lineTo(X(1.5),Z(S.D));rc.stroke();
+  for(const m of S.marbles){if(m.inHole)continue;const x=X(m.pos.x),y=Z(m.pos.z);
+    rc.fillStyle=hex(m.col);rc.beginPath();rc.arc(x,y,4,0,6.3);rc.fill();
+    if(m===S.target||m===S.shot){rc.strokeStyle=m===S.target?'#ff5a3c':'#fff';rc.lineWidth=2.5;rc.beginPath();rc.arc(x,y,8,0,6.3);rc.stroke()}}
+  rc.restore();
+}
+
+/* ---------- Round Flow ---------- */
+function launch(m){
+  const a=Math.random()*6.283;let r,tx,tz;
+  if(Math.random()<.42)r=Math.random()*HR*.8;else r=HR*1.15+Math.random()*Math.random()*2.6;
+  tx=Math.cos(a)*r;tz=Math.sin(a)*r;
+  const dx=tx-m.pos.x,dz=tz-m.pos.z,d=Math.hypot(dx,dz)||.01,sp=Math.sqrt(2*FR*Math.max(.35,d*rnd(.94,1.06)));
+  m.vel.set(dx/d*sp,0,dz/d*sp);m.frozen=false;
+}
+async function doThrow(){
+  S.phase='throw';say('Throwing the pot at the pit…');
+  const pot=S.marbles;
+  pot.forEach((m,i)=>{const a=i/Math.max(1,pot.length)*6.283+rnd(-.2,.2),r=.2+Math.random()*.35,x=Math.cos(a)*r,z=S.D+Math.sin(a)*r*.7;
+    m.pos.set(x,gh(x,z)+R,z);m.vel.set(0,0,0);m.inHole=false;m.frozen=true;m.mesh.position.copy(m.pos);m.sh.position.set(x,gh(x,z)+.008,z)});
+  await wait(650);S.phase='flying';
+  for(const m of pot){launch(m);await wait(52)}
+  await settle(5500);
+}
+const loose=()=>S.marbles.filter(m=>!m.inHole);
+function hardest(){
+  const L=loose();let best=null,bs=-1e9;
+  for(const m of L){
+    let nb=0;for(const o of L)if(o!==m&&Math.hypot(o.pos.x-m.pos.x,o.pos.z-m.pos.z)<.6)nb++;
+    const sc=(S.D-m.pos.z)+nb*.85+Math.max(0,1.4-Math.hypot(m.pos.x,m.pos.z))*.9;
+    if(sc>bs){bs=sc;best=m}}
+  return best;
+}
+function pickAt(cx,cy){
+  let best=null,bd=68;
+  for(const m of loose()){const p=m.pos.clone().project(cam);if(p.z>1)continue;
+    const d=Math.hypot((p.x*.5+.5)*innerWidth-cx,(-p.y*.5+.5)*innerHeight-cy);if(d<bd){bd=d;best=m}}
+  return best;
+}
+let pickRes=null;
+$('#c').on('pointerdown',e=>{if(S.phase!=='target'||!pickRes)return;const m=pickAt(e.clientX,e.clientY);if(m){const r=pickRes;pickRes=null;selRing.visible=false;r(m)}});
+$('#c').on('pointermove',e=>{if(S.phase!=='target'||!pickRes)return;const m=pickAt(e.clientX,e.clientY)||hardest();selRing.visible=!!m;if(m)selRing.position.set(m.pos.x,gh(m.pos.x,m.pos.z)+.03,m.pos.z)});
+function humanPick(){
+  return new Promise(res=>{pickRes=res;const h=hardest();if(h){selRing.visible=true;selRing.position.set(h.pos.x,gh(h.pos.x,h.pos.z)+.03,h.pos.z)}
+    say(`Tap the hardest marble you want ${S.players[S.thrower].name} to hit`)});
+}
+function beginAim(){
+  S.phase='aim';joyReset();
+  const st=STATE_MAP[S.players[S.thrower].name];
+  const m=mk(st?st.c1:PC[S.thrower]);m.pos.set(0,gh(0,S.D)+R,S.D);m.mesh.position.copy(m.pos);
+  S.marbles.push(m);S.shot=m;S.hit=false;
+}
+function fire(){
+  const mag=Math.hypot(jv.x,jv.y);if(S.phase!=='aim'||!S.shot||mag<.09)return;
+  const d=assist(S.shot.pos,new V(jv.x/mag,0,jv.y/mag)),sp=cl(mag,.05,1)*maxSpeed();
+  S.shot.vel.set(d.x*sp,0,d.z*sp);S.shot.frozen=false;S.phase='shooting';
+  elJw.classList.remove('on');aimL.visible=aimRing.visible=false;say('Flicked!');snd(300,.12,.15);
+}
+function aiShot(){
+  const m=S.shot,t=S.target,dx=t.pos.x-m.pos.x,dz=t.pos.z-m.pos.z,need=Math.sqrt(2*FR*Math.max(.4,Math.hypot(dx,dz)));
+  const ang=Math.atan2(dx,dz)+rnd(-.012,.012)*AIQ,sp=need*(1+rnd(-.09,.09)*AIQ);
+  m.vel.set(Math.sin(ang)*sp,0,Math.cos(ang)*sp);m.frozen=false;S.phase='shooting';snd(300,.12,.15);
+}
+function humanShot(){
+  return new Promise(res=>{const t0=performance.now();
+    const f=()=>{if(S.phase!=='aim'||performance.now()-t0>45000){
+        if(S.phase==='aim'){const t=S.target,s=S.shot,l=Math.hypot(t.pos.x-s.pos.x,t.pos.z-s.pos.z)||1;jv.x=(t.pos.x-s.pos.x)/l*.7;jv.y=(t.pos.z-s.pos.z)/l*.7;fire()}
+        res()}else requestAnimationFrame(f)};
+    requestAnimationFrame(f)});
+}
+async function resolveRound(){
+  S.phase='resolve';
+  const sh=S.shot;if(sh){kill(sh);S.marbles=S.marbles.filter(m=>m!==sh);S.shot=null}
+  const inH=S.marbles.filter(m=>m.inHole),th=S.players[S.thrower];
+  if(S.hit){
+    big('POT WON');flash();const n=S.marbles.length;th.marbles+=n;
+    say(`${th.name} hit the target and scoops the whole pot — ${n} marbles!`);
+    S.marbles.forEach(m=>m.frozen=true);await wait(700);S.marbles.forEach(kill);S.marbles=[];
+  }else{
+    big('MISS');
+    say(inH.length?`${th.name} missed — but keeps the ${inH.length} marble${inH.length>1?'s':''} that dropped in the pit.`:`${th.name} missed — and nothing fell in the pit.`);
+    th.marbles+=inH.length;inH.forEach(kill);S.marbles=S.marbles.filter(m=>!m.inHole);
+    S.marbles.forEach(m=>m.frozen=true);await wait(750);
+  }
+  hud();await wait(1200);
+}
+let running=false;
+async function play(){
+  if(running)return;running=true;
+  while(S.round<S.max&&S.players.filter(p=>p.marbles>0).length>1){
+    S.round++;hud();big('ROUND '+S.round);
+    for(const p of S.players){const n=Math.min(S.c,p.marbles);p.marbles-=n;for(let i=0;i<n;i++)S.marbles.push(mk(PAL[Math.random()*PAL.length|0]))}
+    hud();if(!S.marbles.length)break;
+    await doThrow();
+    const th=S.players[S.thrower];let target=null;
+    if(loose().length){
+      S.phase='target';const ds=S.players[(S.thrower+1)%S.players.length];
+      if(ds.isHuman)target=await humanPick();else{say(`${ds.name} is sizing up the hardest marble…`);await wait(900);target=hardest()}
+    }
+    if(!target){
+      const inH=S.marbles.filter(m=>m.inHole);th.marbles+=inH.length;S.marbles.forEach(kill);S.marbles=[];
+      say(`Everything dropped in the pit — ${th.name} keeps ${inH.length}.`);hud();await wait(1400);
+    }else{
+      S.target=target;selRing.visible=false;beginAim();
+      if(th.isHuman){elJw.classList.add('on');say('Your flick — drag the circle toward the target, release to shoot');await humanShot()}
+      else{say(`${th.name} is lining up the shot…`);await wait(950);aiShot()}
+      await settle(6000);await resolveRound();S.target=null;
+    }
+    let g=0;do{S.thrower=(S.thrower+1)%S.players.length}while(S.players[S.thrower].marbles<=0&&++g<8);
+    hud();await wait(280);
+  }
+  running=false;endGame();
+}
+
+/* ---------- UI Helpers & Screens ---------- */
+const cfg={n:3,c:4,s:20,d:6};
+const H1='text-2xl font-extrabold text-[#ffd479] mb-1.5 tracking-tight',SUB='text-[13px] leading-relaxed text-[#d3be94] mb-3',H2='text-[11px] font-bold tracking-[.16em] uppercase text-[#ffd479]/85 mt-4 mb-2',
+ BTN='btn w-full mt-3.5 py-3.5 rounded-2xl font-black tracking-wider text-[#2a1a04] cursor-pointer',
+ BTN_IND='btn-ind w-full mt-3 py-3.5 rounded-2xl font-black tracking-wider cursor-pointer',
+ GH='w-full mt-2 py-2.5 rounded-2xl text-[13px] font-bold bg-white/10 border border-white/15 text-amber-100 hover:bg-white/15 transition cursor-pointer',
+ OPT='opt flex-1 min-w-[62px] rounded-xl border border-white/10 bg-white/5 py-2.5 px-2 text-[13px] font-extrabold text-amber-100 cursor-pointer';
+const para=t=>`<p class="${SUB}">${t}</p>`,sm=t=>`<small class="block text-[9.5px] font-semibold opacity-65 mt-0.5">${t}</small>`;
+const row=(k,vals,lab)=>`<div class="flex gap-2 flex-wrap" data-k="${k}">${vals.map(v=>`<button class="${OPT}${cfg[k]==v?' sel':''}" data-v="${v}">${lab(v)}</button>`).join('')}</div>`;
+const open=h=>{$('#panel').html(h).scrollTop(0);$('#modal').addClass('show')},close=()=>$('#modal').removeClass('show');
+let backFn=null;
+
+function getTrophies(){
+  try{return JSON.parse(localStorage.getItem('kanche-trophies')||'{"quick":0,"district":0,"india":0}')}catch(e){return{quick:0,district:0,india:0}}
+}
+function addTrophy(k){
+  try{const tr=getTrophies();tr[k]=(tr[k]||0)+1;localStorage.setItem('kanche-trophies',JSON.stringify(tr))}catch(e){}
+}
+
+function story(){
+  S.phase='setup';backFn=story;
+  open(`<div class="flex items-center justify-between mb-2">
+    <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-amber-300/80">PUNJABI HERITAGE EDITION</span>
+    <span class="text-[11px] font-bold text-amber-200/80">🇮🇳 28 STATES</span>
+  </div>
+  <h1 class="${H1}">ਕੰਚੇ · Kanche</h1>`+
+  para('The last school bell rings in a village near Jalandhar. Bags are flung onto the charpai, and Maa hands out hot chai in steel glasses with a rusk to dunk. ☕')+
+  para('From the dusty lanes under old tahli and neem trees to the <b>All-India Inter-State Championship</b> — conquer your district in Punjab, then take on all 28 Indian states one by one!')+
+  `<button class="${BTN}" data-act="setup">☕ Chai done — let’s play!</button>
+   <button class="${BTN_IND}" data-act="natCup">🇮🇳 ALL-INDIA STATE CHAMPIONSHIP</button>
+   <button class="${GH}" data-act="rules">HOW TO PLAY</button>`);
+}
+
+function setup(){
+  S.phase='setup';S.mode='quick';backFn=setup;running=false;
+  kids.forEach(k=>scene.remove(k.g));kids.length=0;S.marbles.forEach(kill);S.marbles=[];S.shot=S.target=null;
+  elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;
+  const tr=getTrophies();
+  open(`<div class="flex items-center justify-between mb-1">
+    <h1 class="${H1} !mb-0">Match Center</h1>
+    <div class="flex gap-1.5 text-[11px] font-bold">
+      <span class="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10" title="District Cups">🏆 ${tr.district||0}</span>
+      <span class="px-2 py-0.5 rounded-lg bg-amber-400/15 border border-amber-300/30 text-[#ffd479]" title="All-India Championships">🇮🇳 ${tr.india||0}</span>
+    </div>
+  </div>`+
+  para('Play a village match, win the Punjab District Cup, or enter the 28-State All-India Championship.')+
+  `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+    <button class="text-left p-3.5 rounded-2xl border border-amber-300/40 bg-gradient-to-br from-amber-500/20 to-orange-900/20 hover:border-[#ffd479] transition cursor-pointer" data-act="natCup">
+      <div class="text-[10px] font-extrabold tracking-widest text-[#ffd479]">🇮🇳 NATIONAL TOURNAMENT</div>
+      <div class="text-[15px] font-black text-white mt-0.5">All-India State Cup</div>
+      <div class="text-[11px] text-amber-100/75 mt-0.5">Punjab vs Random States • 28-State Elimination</div>
+    </button>
+    <button class="text-left p-3.5 rounded-2xl border border-white/15 bg-white/5 hover:border-amber-200/40 transition cursor-pointer" data-act="cup">
+      <div class="text-[10px] font-extrabold tracking-widest text-amber-200/80">🏆 STATE QUALIFIER</div>
+      <div class="text-[15px] font-black text-white mt-0.5">Punjab District Cup</div>
+      <div class="text-[11px] text-amber-100/75 mt-0.5">23 Districts • Winner qualifies for India Cup!</div>
+    </button>
+  </div>`+
+  `<div class="border-t border-white/10 pt-3 mt-1">
+    <div class="text-[11px] font-extrabold tracking-[.16em] uppercase text-[#ffd479] mb-2">Quick Village Match</div>
+    <input id="nm" maxlength="14" placeholder="Your name" value="${cfg.name||''}" class="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-[13px] text-amber-100 outline-none">
+    <h2 class="${H2} !mt-3">Players</h2>`+row('n',[2,3,4],v=>v+sm(['','','DUEL','TRIO','FOUR'][v]))+
+    `<h2 class="${H2}">Marbles pooled per round</h2>`+row('c',[3,4,6],v=>v+sm('PER ROUND'))+
+    `<h2 class="${H2}">Starting pocket & Distance</h2>`+
+    `<div class="grid grid-cols-2 gap-2">
+      <div>`+row('s',[12,20,30],v=>v+sm('POCKET'))+`</div>
+      <div>`+row('d',[6,9,12,15],v=>v+'ft'+sm({6:'CLASSIC',9:'LONG',12:'HARD',15:'PRO'}[v]))+`</div>
+    </div>
+    <p id="pot" class="${SUB} mt-2.5 !mb-1"></p>
+    <button class="${BTN} !mt-2" data-act="start">START QUICK MATCH</button>
+    <button class="${GH}" data-act="rules">HOW TO PLAY</button>
+  </div>`);
+  potTxt();
+}
+const potTxt=()=>$('#pot').html(`Pot each round: <b>${cfg.n*cfg.c}</b> marbles`);
+
+function rules(){
+  open(`<h1 class="${H1}">How to play</h1>`+para('Kanche, the marble game every Punjabi village kid grew up with.')+
+  `<ol class="list-decimal pl-5 space-y-2 text-[13px] leading-relaxed text-[#d3be94]">
+  <li><b>The pot.</b> Every player pools marbles into the pot each round.</li>
+  <li><b>The throw.</b> The thrower rolls the whole pot toward the pit on the sloping ground. Some drop in, the rest scatter around it.</li>
+  <li><b>The target.</b> The next player picks the <b>hardest</b> scattered marble: the farthest, or the one hiding among others.</li>
+  <li><b>The flick.</b> The thrower flicks their own marble from the throw line to hit that target.</li>
+  <li><b>Hit wins.</b> A clean hit wins the <b>entire pot</b>. A miss keeps only the marbles that fell in the pit.</li>
+  <li><b>All-India State Progression.</b> In the National Championship, you represent <b>Punjab</b> (or any of the 28 Indian states) against a randomly drawn rival state. Defeat them to advance and face the next random state until you conquer all of India!</li></ol>
+  <h2 class="${H2}">Controls</h2>`+para('Drag the round pad toward your target. The farther you pull, the harder the flick, and a dotted line previews the roll. Release to shoot. When it’s your turn to choose, tap a marble on the ground. 🔊 toggles sound.')+
+  `<button class="${BTN}" data-act="back">BACK</button>`);
+}
+
+function start(m,mode='quick'){
+  S.mode=mode;
+  if(!m)AIQ=1;
+  const n=m?2:cfg.n;
+  Object.assign(S,{c:m?3:cfg.c,D:m?[6,9,12][Math.random()*3|0]:cfg.d,round:0,thrower:0,hit:false,max:m?4:cfg.n*3});
+  S.players=Array.from({length:n},(_,i)=>({name:m?m[i]:i?PN[i]:(cfg.name||'You'),isHuman:!i,marbles:m?9:cfg.s,color:PC[i]}));
+  S.marbles.forEach(kill);S.marbles=[];
+  close();buildGround();buildVillage(S.D);fitCamera();spawnKids();hud();S.phase='ready';
+  say(m?`${m[0]} vs ${m[1]} — Kick-off!`:'Everyone chips in…');setTimeout(play,420);
+}
+
+function endGame(){
+  if(N && N.live){S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;return natResult()}
+  if(T && T.live){S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;return cupResult()}
+  S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;
+  const L=[...S.players].sort((a,b)=>b.marbles-a.marbles),w=L[0];let wins=0;
+  try{wins=+localStorage.getItem('kanche-wins')||0;if(w.isHuman){localStorage.setItem('kanche-wins',++wins);addTrophy('quick')}}catch(e){}
+  open(`<h1 class="${H1}">${w.isHuman?'You win! 🏆':w.name+' wins'}</h1>`+para('The sun slips behind the trees and mothers start calling from the lanes. Tomorrow, same time, same shade.')+
+  `<div class="flex flex-col gap-2">${L.map((p,i)=>`<div class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border ${i?'bg-white/5 border-white/10':'bg-amber-400/15 border-[#ffd479]'}"><span class="w-2.5 h-2.5 rounded-full" style="background:${hex(p.color)}"></span><b class="flex-1 !text-white">${p.name}${p.isHuman?' (you)':''}</b><b>${p.marbles}</b></div>`).join('')}</div>`+
+  (wins?para(`<span class="block mt-3">Your village wins on this device: <b>${wins}</b></span>`):'')+
+  `<button class="${BTN}" data-act="setup">PLAY AGAIN</button>`);
+}
+
+/* ---------- Shared Idle Helper ---------- */
+const idle=()=>{S.phase='setup';backFn=setup;running=false;S.marbles.forEach(kill);S.marbles=[];S.shot=S.target=null;kids.forEach(k=>scene.remove(k.g));kids.length=0;elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false};
+
+/* ---------- 1. Punjab District Cup (23 Districts -> Winner advances to All-India State Cup) ---------- */
+const DIST=['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka','Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Malerkotla','Mansa','Moga','Pathankot','Patiala','Rupnagar','Mohali','Sangrur','Nawanshahr','Sri Muktsar Sahib','Tarn Taran'];
+const STG={G:'Group stage',QF:'Quarter-finals',SF:'Semi-finals',F:'Final'};
+let T=null,AIQ=1;
+const save=()=>{try{localStorage.setItem('kanche-cup',JSON.stringify(T))}catch(e){}};
+const mine=f=>f.a===T.me||f.b===T.me,fin=(f,ga,gb,pen)=>Object.assign(f,{ga,gb,pen,done:1});
+function sim(f,ko){
+  const g=t=>Math.max(0,Math.round(3+(T.str[t]-60)/10+rnd(0,5)));let ga=g(f.a),gb=g(f.b),pen=0;
+  if(ko&&ga===gb){pen=1;Math.random()<T.str[f.a]/(T.str[f.a]+T.str[f.b])?ga++:gb++}
+  fin(f,ga,gb,pen);
+}
+function stand(g){
+  const r={};T.groups[g].forEach(t=>r[t]={t,p:0,pt:0,d:0,f:0});
+  T.fx.filter(f=>f.g===g&&f.done).forEach(f=>{const a=r[f.a],b=r[f.b];a.p++;b.p++;a.f+=f.ga;b.f+=f.gb;a.d+=f.ga-f.gb;b.d+=f.gb-f.ga;
+    if(f.ga>f.gb)a.pt+=3;else if(f.ga<f.gb)b.pt+=3;else{a.pt++;b.pt++}});
+  return Object.values(r).sort((x,y)=>y.pt-x.pt||y.d-x.d||y.f-x.f||x.t.localeCompare(y.t));
+}
+function batch(){
+  const L=T.fx.filter(f=>!f.done&&!mine(f)).sort(()=>Math.random()-.5),h=T.fx.filter(f=>!f.done&&mine(f)).length,n=h?Math.ceil(L.length/(h+1)):L.length;
+  L.slice(0,n).forEach(f=>sim(f,0));if(T.fx.every(f=>f.done))toKO();
+}
+function toKO(){
+  const q=T.groups.map((_,g)=>stand(g).slice(0,2).map(r=>r.t)),[A,B,C,D]=q;
+  if(!q.flat().includes(T.me))T.exit='G';
+  T.stage='QF';T.ko=[[A[0],B[1]],[B[0],A[1]],[C[0],D[1]],[D[0],C[1]]].map(([a,b])=>({a,b,done:0}));playOut();
+}
+function playOut(){
+  for(;;){
+    T.ko.forEach(f=>{if(!f.done&&!mine(f))sim(f,1)});
+    if(T.ko.some(f=>!f.done))return;
+    const w=T.ko.map(f=>f.ga>f.gb?f.a:f.b);
+    if(T.stage==='F'){T.champ=w[0];return}
+    T.stage=T.stage==='QF'?'SF':'F';T.ko=[];for(let i=0;i<w.length;i+=2)T.ko.push({a:w[i],b:w[i+1],done:0});
+  }
+}
+function picker(){
+  idle();T=null;
+  open(`<h1 class="${H1}">Punjab District Cup</h1>`+para('23 districts are drawn into 4 groups. Win the Punjab District Cup to qualify as Team Punjab for the <b>All-India State Championship</b>!')+
+  `<div class="grid grid-cols-2 gap-2">${DIST.map((d,i)=>`<button class="dst ${OPT.replace('opt ','')}" data-i="${i}">${d}</button>`).join('')}</div><button class="${GH}" data-act="setup">BACK</button>`);
+}
+function newCup(i){
+  const me=DIST[i],groups=[[],[],[],[]],str={};
+  [...DIST].sort(()=>Math.random()-.5).forEach((t,k)=>groups[k%4].push(t));
+  DIST.forEach(t=>str[t]=Math.round(rnd(60,95)));
+  const fx=[];groups.forEach((g,gi)=>{for(let a=0;a<g.length;a++)for(let b=a+1;b<g.length;b++)fx.push({g:gi,a:g[a],b:g[b],done:0})});
+  T={me,groups,str,fx,stage:'G',ko:[],live:0,gi:groups.findIndex(g=>g.includes(me))};save();cupHub();
+}
+function cupHub(){
+  idle();
+  if(T.champ){
+    const w=T.champ===T.me;
+    if(w && !T.rewarded){T.rewarded=1;save();addTrophy('district');fanfare()}
+    open(`<h1 class="${H1}">${w?'🏆 '+T.me+' are Punjab Champions!':T.champ+' win the cup'}</h1>`+
+    para(w?`<b>${T.me}</b> has conquered all of Punjab! Now represent <b>Punjab</b> against the other 27 Indian states in the National Championship!`:`${T.me} went out in the ${T.exit==='G'?'group stage':STG[T.exit].toLowerCase()}. Try again next season.`)+
+    (w?`<button class="${BTN_IND}" data-act="promotePunjab">🇮🇳 ADVANCE AS PUNJAB TO NATIONAL CUP</button>`:'')+
+    `<button class="${w?GH:BTN}" data-act="cupReset">NEW DISTRICT CUP</button><button class="${GH}" data-act="setup">MENU</button>`);
+    return;
+  }
+  const nx=(T.stage==='G'?T.fx:T.ko).find(f=>!f.done&&mine(f)),o=nx.a===T.me?nx.b:nx.a;
+  const body=T.stage==='G'
+    ?`<h2 class="${H2}">Group ${'ABCD'[T.gi]}</h2><table class="w-full text-[12.5px] text-[#d3be94]"><tr class="text-[10px] uppercase opacity-60"><td>District</td><td>P</td><td>MD</td><td>Pts</td></tr>${stand(T.gi).map((r,i)=>`<tr class="${r.t===T.me?'text-white font-bold':''} ${i<2?'':'opacity-70'}"><td class="py-1">${i+1}. ${r.t}</td><td>${r.p}</td><td>${r.d}</td><td><b>${r.pt}</b></td></tr>`).join('')}</table>`
+    :`<h2 class="${H2}">${STG[T.stage]}</h2>`+T.ko.map(f=>`<div class="flex justify-between gap-2 py-1 text-[13px] ${mine(f)?'text-white font-bold':'text-[#d3be94]'}"><span>${f.a}</span><span>${f.done?f.ga+' – '+f.gb+(f.pen?'*':''):'vs'}</span><span>${f.b}</span></div>`).join('');
+  open(`<h1 class="${H1}">Punjab District Cup</h1>`+para(`${STG[T.stage]} · playing for <b>${T.me}</b>`)+body+
+   para(`<span class="block mt-3">Next Fixture: <b>${T.me}</b> vs <b>${o}</b> (OVR: ${T.str[o]})</span>`)+
+   `<button class="${BTN}" data-act="cupPlay">PLAY MATCH</button><button class="${GH}" data-act="cupReset">ABANDON CUP</button><button class="${GH}" data-act="setup">MENU</button>`);
+}
+function cupPlay(){
+  const f=(T.stage==='G'?T.fx:T.ko).find(f=>!f.done&&mine(f)),o=f.a===T.me?f.b:f.a;
+  T.cur=f;T.live=1;AIQ=cl((105-T.str[o])/35,.5,1.6);start([T.me,o],'district');
+}
+function cupResult(){
+  const f=T.cur,h=S.players[0].marbles,o=S.players[1].marbles,ko=T.stage!=='G',a=f.a===T.me;let hh=h,oo=o,pen=0;
+  if(ko&&h===o){pen=1;Math.random()<.5?hh++:oo++}
+  fin(f,a?hh:oo,a?oo:hh,pen);T.live=0;
+  if(!ko)batch();else{if(hh<oo)T.exit=T.stage;playOut()}
+  save();
+  open(`<h1 class="${H1}">${hh>oo?'Victory! 🏆':hh<oo?'Defeat':'Draw'}</h1>`+para(`${T.me} <b>${hh}</b> – <b>${oo}</b> ${a?f.b:f.a}${pen?'<br>Level after four rounds — decided by golden toss.':''}`)+`<button class="${BTN}" data-act="cupHub">CONTINUE</button>`);
+}
+function cup(){if(!T)try{T=JSON.parse(localStorage.getItem('kanche-cup'))}catch(e){T=null}T?(T.live=0,cupHub()):picker()}
+function cupReset(){try{localStorage.removeItem('kanche-cup')}catch(e){}picker()}
+$('#panel').on('click','.dst',function(){newCup(+$(this).data('i'))});
+
+/* ---------- 2. ALL-INDIA INTER-STATE CHAMPIONSHIP (Winner of Punjab vs Random State -> Winner vs Next Random State) ---------- */
+let N=null;
+const saveNat=()=>{try{localStorage.setItem('kanche-india',JSON.stringify(N))}catch(e){}};
+const natRoundLabel=rem=>{
+  if(rem===2)return'ALL-INDIA GRAND FINAL';
+  if(rem<=4)return'SEMI-FINALS';
+  if(rem<=8)return'QUARTER-FINALS';
+  if(rem<=16)return'PRE-QUARTERFINALS';
+  return'NATIONAL QUALIFIER';
+};
+
+function natPicker(defaultState='Punjab'){
+  idle();N=null;
+  const pIdx=STATES.findIndex(s=>s.name===defaultState);
+  open(`<div class="flex items-center justify-between mb-1">
+    <span class="text-[10px] font-extrabold tracking-[.2em] uppercase text-[#ffd479]">🇮🇳 28 INDIAN STATES</span>
+    <span class="text-[10px] font-bold text-emerald-300">RANDOM KNOCKOUT DRAW</span>
+  </div>
+  <h1 class="${H1}">Indian State Championship</h1>`+
+  para('Select your state (<b>Punjab</b> is featured as defending host). In each stage, your state faces a <b>randomly drawn rival state</b> — defeat them and the winner advances to battle the next random state until one state claims the <b>All-India Kanche Trophy</b>!')+
+  (pIdx>=0?`<button class="${BTN_IND} !mt-1 mb-3 flex items-center justify-center gap-2.5" data-st="${pIdx}">
+    ${crestHTML('Punjab','w-6 h-6 text-[9px]')}
+    <span>PLAY AS PUNJAB (FEATURED HOST)</span>
+  </button>`:'')+
+  `<h2 class="${H2} !mt-2">Or choose any of the 28 States</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+    ${STATES.map((s,i)=>`<button class="nst flex items-center gap-2 text-left rounded-xl border ${s.name==='Punjab'?'border-[#ffd479] bg-amber-400/15':'border-white/10 bg-white/5 hover:border-amber-200/40'} p-2 text-[12px] font-bold text-amber-50 transition cursor-pointer" data-st="${i}">
+      ${crestHTML(s.name,'w-6 h-6 text-[9px]')}
+      <span class="truncate">${s.name}</span>
+    </button>`).join('')}
+  </div>
+  <button class="${GH}" data-act="setup">BACK TO MENU</button>`);
+}
+
+function newNatCup(stateIndex){
+  const me=STATES[stateIndex].name;
+  const str={};
+  STATES.forEach(s=>{
+    // Balanced competitive OVR ratings (68-94)
+    str[s.name]=s.name==='Punjab'?88:Math.round(rnd(68,94));
+  });
+  // Shuffle all 28 states into the active contender pool
+  const pool=STATES.map(s=>s.name).sort(()=>Math.random()-.5);
+  N={
+    me,
+    pool,          // Remaining undefeated states in the tournament
+    eliminated:[], // Defeated states in order
+    history:[],    // Match log {round, a, b, ga, gb, pen, userMatch}
+    str,
+    live:0,
+    champ:null,
+    exitRound:null,
+    nextOpp:null
+  };
+  drawNextNatOpponent();
+  saveNat();
+  natHub();
+}
+
+function drawNextNatOpponent(){
+  if(!N || N.champ)return;
+  const rivals=N.pool.filter(s=>s!==N.me);
+  if(rivals.length===0){
+    N.champ=N.me;
+    return;
+  }
+  // Pick a random opponent from remaining undefeated states
+  N.nextOpp=rivals[Math.floor(Math.random()*rivals.length)];
+}
+
+function simOtherStateClashes(){
+  // Simulate parallel random state-vs-state clashes so the tournament narrows realistically toward the Grand Final
+  const others=N.pool.filter(s=>s!==N.me && s!==N.nextOpp).sort(()=>Math.random()-.5);
+  if(others.length<2)return[];
+  // Pair up to half of the remaining non-user states so the bracket shrinks cleanly alongside the player's wins
+  const pairsCount=Math.max(1,Math.floor(others.length/2));
+  const roundName=natRoundLabel(N.pool.length);
+  const results=[];
+  for(let i=0;i+1<pairsCount*2;i+=2){
+    const a=others[i],b=others[i+1];
+    let ga=Math.max(1,Math.round(4+(N.str[a]-70)/9+rnd(0,5)));
+    let gb=Math.max(1,Math.round(4+(N.str[b]-70)/9+rnd(0,5)));
+    let pen=0;
+    if(ga===gb){pen=1;Math.random()<N.str[a]/(N.str[a]+N.str[b])?ga++:gb++}
+    const loser=ga>gb?b:a;
+    N.pool=N.pool.filter(s=>s!==loser);
+    N.eliminated.push(loser);
+    const rec={round:roundName,a,b,ga,gb,pen,userMatch:false};
+    N.history.unshift(rec);
+    results.push(rec);
+  }
+  return results;
+}
+
+function natHub(){
+  idle();
+  if(!N)return natPicker('Punjab');
+
+  // Championship Completed Screen
+  if(N.champ){
+    const won=N.champ===N.me;
+    if(won && !N.rewarded){N.rewarded=1;saveNat();addTrophy('india');fanfare()}
+    const st=stateObj(N.champ);
+    open(`<div class="text-center py-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/15 border border-[#ffd479] text-[11px] font-extrabold tracking-widest text-[#ffd479] mb-3">
+        🇮🇳 ALL-INDIA INTER-STATE CHAMPIONSHIP
+      </div>
+      <div class="flex justify-center mb-3">${crestHTML(N.champ,'w-16 h-16 text-xl')}</div>
+      <h1 class="${H1} !text-3xl">${won?'🏆 '+N.me+' ARE NATIONAL CHAMPIONS!':N.champ+' Win the India Cup'}</h1>
+      <p class="${SUB} max-w-md mx-auto">${won
+        ?`History made! <b>${N.me}</b> defeated every rival state across India to lift the glittering All-India Kanche Trophy!`
+        :`<b>${N.me}</b> were knocked out in the <b>${N.exitRound||'National Round'}</b>. Meanwhile, <b>${N.champ}</b> went on to win the All-India Final.`}</p>
+    </div>
+    <h2 class="${H2}">Tournament Match Log</h2>
+    <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+      ${N.history.map(m=>`<div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl border ${m.userMatch?'border-amber-300/35 bg-amber-400/10 text-white font-bold':'border-white/10 bg-white/5 text-[#d3be94]'} text-[12px]">
+        <span class="truncate flex-1">${m.a}</span>
+        <span class="px-2 py-0.5 rounded bg-black/50 text-[#ffd479] font-black">${m.ga} – ${m.gb}${m.pen?'*':''}</span>
+        <span class="truncate flex-1 text-right">${m.b}</span>
+      </div>`).join('')}
+    </div>
+    <button class="${BTN_IND}" data-act="natReset">NEW ALL-INDIA CHAMPIONSHIP</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+
+  // Active Matchday Broadcast Card
+  if(!N.nextOpp)drawNextNatOpponent();
+  const meSt=stateObj(N.me),oppSt=stateObj(N.nextOpp);
+  const roundTitle=natRoundLabel(N.pool.length);
+  const progressPct=Math.round(((28-N.pool.length)/27)*100);
+
+  open(`<div class="flex items-center justify-between gap-2 mb-2">
+    <span class="px-2.5 py-1 rounded-full bg-amber-400/15 border border-[#ffd479]/50 text-[10px] font-black tracking-widest text-[#ffd479]">${roundTitle}</span>
+    <span class="text-[11px] font-bold text-amber-200/80">${N.pool.length} / 28 States Remaining</span>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="w-full h-1.5 rounded-full bg-black/60 border border-white/10 overflow-hidden mb-3">
+    <div class="h-full bg-gradient-to-r from-orange-500 via-amber-300 to-emerald-500" style="width:${Math.max(4,progressPct)}%"></div>
+  </div>
+
+  <!-- FIFA-Style Pre-Match Versus Broadcast Card -->
+  <div class="rounded-2xl border border-amber-300/35 bg-gradient-to-b from-black/60 to-amber-950/25 p-4 mb-3 shadow-inner">
+    <div class="text-center text-[10px] font-extrabold uppercase tracking-[.22em] text-amber-200/70 mb-3">NEXT RANDOM DRAW FIXTURE</div>
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+      <div class="flex flex-col items-center">
+        ${crestHTML(N.me,'w-12 h-12 text-sm')}
+        <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${N.me}</div>
+        <div class="text-[10px] font-bold text-amber-300 mt-0.5">OVR ${N.str[N.me]} • YOU</div>
+      </div>
+      <div class="px-2">
+        <div class="w-9 h-9 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-xs text-[#ffd479]">VS</div>
+      </div>
+      <div class="flex flex-col items-center">
+        ${crestHTML(N.nextOpp,'w-12 h-12 text-sm')}
+        <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${N.nextOpp}</div>
+        <div class="text-[10px] font-bold text-emerald-300 mt-0.5">OVR ${N.str[N.nextOpp]} • ${oppSt.zone}</div>
+      </div>
+    </div>
+    <div class="text-center text-[11px] text-[#d3be94] mt-3 pt-2.5 border-t border-white/10">
+      Winner advances to face the next randomly drawn state!
+    </div>
+  </div>
+
+  ${N.history.length?`
+    <h2 class="${H2} !mt-2">Recent National Results</h2>
+    <div class="space-y-1.5 max-h-32 overflow-y-auto pr-1 mb-2">
+      ${N.history.slice(0,6).map(m=>`<div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg border ${m.userMatch?'border-amber-300/30 bg-amber-400/10 text-white font-bold':'border-white/5 bg-white/5 text-[#d3be94]'} text-[11.5px]">
+        <span class="truncate flex-1">${m.a}</span>
+        <span class="px-1.5 py-0.5 rounded bg-black/50 text-[#ffd479] font-extrabold">${m.ga} – ${m.gb}${m.pen?'*':''}</span>
+        <span class="truncate flex-1 text-right">${m.b}</span>
+      </div>`).join('')}
+    </div>
+  `:''}
+
+  <button class="${BTN_IND}" data-act="natPlay">PLAY STATE MATCH (${meSt.code3||meSt.code} vs ${oppSt.code3||oppSt.code})</button>
+  <button class="${GH}" data-act="natReset">CHANGE STATE / RESTART</button>
+  <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+}
+
+function natPlay(){
+  if(!N || !N.nextOpp)return;
+  N.live=1;
+  // Scale AI accuracy smoothly with opponent state OVR and tournament progression
+  const roundBoost=(28-N.pool.length)*.012;
+  AIQ=cl((106-N.str[N.nextOpp])/34 - roundBoost,.42,1.55);
+  start([N.me,N.nextOpp],'india');
+}
+
+function natResult(){
+  const opp=N.nextOpp;
+  let hh=S.players[0].marbles,oo=S.players[1].marbles,pen=0;
+  if(hh===oo){pen=1;Math.random()<.52?hh++:oo++}
+  const roundName=natRoundLabel(N.pool.length);
+  N.live=0;
+  N.history.unshift({round:roundName,a:N.me,b:opp,ga:hh,gb:oo,pen,userMatch:true});
+
+  if(hh>oo){
+    // Player's state wins! Eliminate opponent and simulate parallel random state clashes
+    N.pool=N.pool.filter(s=>s!==opp);
+    N.eliminated.push(opp);
+    // Boost player's state rating slightly on victory
+    N.str[N.me]=Math.min(99,N.str[N.me]+1);
+    const otherRes=simOtherStateClashes();
+    N.nextOpp=null;
+    drawNextNatOpponent();
+    saveNat();
+
+    const isChamp=N.champ===N.me;
+    open(`<h1 class="${H1}">${isChamp?'🏆 ALL-INDIA CHAMPIONS!':'State Victory! 🇮🇳'}</h1>`+
+    para(`<b>${N.me} ${hh} – ${oo} ${opp}</b>${pen?' (Won on Golden Toss)':''}<br>${isChamp
+      ?`<b>${N.me}</b> has defeated all rival states to win the All-India Kanche Trophy!`
+      :`<b>${opp}</b> is eliminated! Next random opponent drawn: <b>${N.nextOpp}</b> (${natRoundLabel(N.pool.length)}).`}`)+
+    (otherRes.length?`<h2 class="${H2}">Other State Clashes Today</h2>
+      <div class="space-y-1 max-h-32 overflow-y-auto mb-2">
+        ${otherRes.map(r=>`<div class="flex justify-between text-[11.5px] px-2.5 py-1 rounded bg-white/5 text-[#d3be94]"><span>${r.a}</span><b>${r.ga} – ${r.gb}${r.pen?'*':''}</b><span>${r.b}</span></div>`).join('')}
+      </div>`:'')+
+    `<button class="${BTN_IND}" data-act="natHub">${isChamp?'CLAIM TROPHY':'NEXT RANDOM STATE'}</button>`);
+  }else{
+    // Player's state is eliminated; simulate remaining states to crown the national champion
+    N.exitRound=roundName;
+    N.pool=N.pool.filter(s=>s!==N.me);
+    N.eliminated.push(N.me);
+    while(N.pool.length>1){
+      N.pool.sort(()=>Math.random()-.5);
+      const a=N.pool[0],b=N.pool[1];
+      let ga=Math.round(4+rnd(0,5)),gb=Math.round(4+rnd(0,5)),p2=0;
+      if(ga===gb){p2=1;Math.random()<N.str[a]/(N.str[a]+N.str[b])?ga++:gb++}
+      const loser=ga>gb?b:a;
+      N.pool=N.pool.filter(s=>s!==loser);
+      N.history.unshift({round:natRoundLabel(N.pool.length+1),a,b,ga,gb,pen:p2,userMatch:false});
+    }
+    N.champ=N.pool[0];
+    saveNat();
+    open(`<h1 class="${H1}">Knocked Out</h1>`+
+    para(`<b>${N.me} ${hh} – ${oo} ${opp}</b>${pen?' (Lost on Golden Toss)':''}<br><b>${opp}</b> advances in the All-India Championship! <b>${N.champ}</b> went on to lift the national trophy.`)+
+    `<button class="${BTN}" data-act="natHub">VIEW TOURNAMENT SUMMARY</button>`);
+  }
+}
+
+function natCup(){
+  if(!N)try{N=JSON.parse(localStorage.getItem('kanche-india'))}catch(e){N=null}
+  N?(N.live=0,natHub()):natPicker('Punjab');
+}
+function natReset(){try{localStorage.removeItem('kanche-india')}catch(e){}natPicker('Punjab')}
+function promotePunjab(){
+  const pIdx=STATES.findIndex(s=>s.name==='Punjab');
+  newNatCup(pIdx>=0?pIdx:19);
+}
+$('#panel').on('click','.nst',function(){newNatCup(+$(this).data('st'))});
+
+/* ---------- Global Event Wiring ---------- */
+$('#panel').on('input','#nm',function(){cfg.name=this.value.replace(/[<>&"']/g,'')});
+$('#panel').on('click','.opt',function(){const r=$(this).parent();cfg[r.data('k')]=+$(this).data('v');r.children().removeClass('sel');$(this).addClass('sel');potTxt()})
+ .on('click','[data-act]',function(){
+   const act=$(this).data('act');
+   const map={setup,rules,start:()=>start(),cup,cupPlay,cupReset,cupHub,natCup,natPlay,natReset,natHub,promotePunjab,back:()=>backFn?backFn():close()};
+   if(map[act])map[act]();
+ });
+$('#help').on('click',()=>{if(S.phase==='setup'||S.phase==='over')return;backFn=close;rules()});
+
+/* ---------- Main Animation Loop ---------- */
+let last=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(now-last)/1000);
+  physics(dt);last=now;
+  animKids(now/1000,dt);
+  radar();
+
+  // Gentle breeze in tree canopies & floating golden dust motes
+  const t=now*.001;
+  for(let i=0;i<canopies.length;i++){
+    const c=canopies[i];
+    c.crown.rotation.z=Math.sin(t*1.1+c.ph)*.025;
+    c.crown.rotation.x=Math.cos(t*.9+c.ph)*.02;
+  }
+  const dp=dustGeo.attributes.position.array;
+  for(let i=0;i<dustCount;i++){
+    dp[i*3+1]+=Math.sin(t+i)*.0015;
+    dp[i*3]+=Math.cos(t*.7+i)*.0015;
+  }
+  dustGeo.attributes.position.needsUpdate=true;
+
+  const sh=S.phase==='shooting'&&S.shot;
+  look.lerp(sh?S.shot.pos:lookBase,sh?.07:.04);
+  cam.position.set(camBase.x+Math.sin(now*3e-4)*.18,camBase.y+Math.sin(now*4e-4)*.06,camBase.z);
+  cam.lookAt(look);
+  if(fovK>.01){fovK*=.94;cam.fov=42-6*fovK;cam.updateProjectionMatrix()}
+  if(S.phase==='aim')guide();
+  if(selRing.visible){selRing.material.opacity=.55+Math.sin(now*.006)*.35;selRing.scale.setScalar(1+Math.sin(now*.006)*.08)}
+  ren.render(scene,cam);
+}
+addEventListener('resize',()=>{ren.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();fitCamera()});
+addEventListener('orientationchange',()=>setTimeout(()=>dispatchEvent(new Event('resize')),120));
+document.addEventListener('gesturestart',e=>e.preventDefault());
+
+buildGround();buildVillage(6);fitCamera();hud();story();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
