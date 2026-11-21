@@ -1,0 +1,2138 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#140e07">
+<title>ਕੰਚੇ · Kanche — World Marbles Championship</title>
+<style>
+:root{--g:#ffd479;--gold-grad:linear-gradient(135deg,#fff3c4,#ffd479 45%,#d98a16);color-scheme:dark}
+html,body{height:100%;overflow:hidden;background:#0d0b07;color:#fff;user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+b{color:var(--g)}
+.glass{background:rgba(12,9,5,.64);border:1px solid rgba(255,212,121,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.fifa-bar{background:linear-gradient(90deg,rgba(12,10,7,.94),rgba(32,22,10,.96) 50%,rgba(12,10,7,.94));border:1px solid rgba(255,212,121,.4);box-shadow:0 8px 28px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,255,255,.14)}
+#hud{padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left))}
+#jw{transition:.25s;opacity:0;transform:translateY(14px);pointer-events:none;height:0}
+#jw.on{opacity:1;transform:none;pointer-events:auto;height:auto}
+#jb{background:radial-gradient(circle,rgba(255,212,121,.16),rgba(0,0,0,.62) 70%);touch-action:none;box-shadow:0 0 0 6px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.65)}
+#jk{background:radial-gradient(circle at 35% 30%,#fff6d8,#ffc94a 45%,#b5761a)}
+#jp i{background:linear-gradient(90deg,#63d471,#ffd479 55%,#ff6b3d)}
+#modal{background:radial-gradient(ellipse at 50% 25%,rgba(68,42,12,.86),rgba(5,4,2,.97))}
+#modal.show{display:flex}
+.panel{touch-action:pan-y;background:linear-gradient(180deg,#261b0e,#120c06);box-shadow:0 24px 60px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,212,121,.18)}
+.btn{background:linear-gradient(180deg,#ffe9aa,#ffb830 55%,#dc840c);box-shadow:0 6px 20px rgba(224,138,16,.35);transition:transform .12s,filter .12s}
+.btn:active{transform:scale(.98);filter:brightness(.95)}
+.btn-ind{background:linear-gradient(135deg,#ff9933 0%,#ffd479 50%,#138808 100%);color:#120c05;box-shadow:0 6px 22px rgba(255,153,51,.3)}
+.btn-wld{background:linear-gradient(135deg,#38bdf8 0%,#ffd479 50%,#10b981 100%);color:#0f172a;box-shadow:0 6px 24px rgba(56,189,248,.32)}
+.btn-cos{background:linear-gradient(135deg,#a855f7 0%,#ffd479 50%,#38bdf8 100%);color:#0b0714;box-shadow:0 6px 26px rgba(168,85,247,.38)}
+.opt.sel{background:linear-gradient(180deg,rgba(255,200,80,.32),rgba(255,150,30,.14));border-color:var(--g);color:#fff6d8}
+#flash{background:radial-gradient(circle at 50% 45%,rgba(255,225,140,.6),transparent 65%)}
+#flash.go{animation:fl .65s ease-out}@keyframes fl{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+#big{transform:translate(-50%,-50%);background:linear-gradient(180deg,#fff,#ffd479 45%,#ff8a3d);-webkit-background-clip:text;background-clip:text;color:transparent!important;filter:drop-shadow(0 6px 22px rgba(255,90,60,.6))}
+input{user-select:text;-webkit-user-select:text}
+#cine{background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.58)),linear-gradient(180deg,rgba(255,140,70,.16),transparent 35%,rgba(255,180,70,.12))}
+#cine::after{content:"";position:absolute;inset:0;opacity:.06;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
+#big.go{animation:bg 1.4s ease-out forwards}@keyframes bg{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%)}}
+.crest{display:inline-flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:.04em;border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 3px 10px rgba(0,0,0,.45)}
+.panel::-webkit-scrollbar{width:5px}
+.panel::-webkit-scrollbar-track{background:rgba(0,0,0,.25);border-radius:9px}
+.panel::-webkit-scrollbar-thumb{background:rgba(255,212,121,.35);border-radius:9px}
+</style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<canvas id="c" class="fixed inset-0 w-full h-full block"></canvas>
+<div id="cine" class="fixed inset-0 z-[4] pointer-events-none"></div>
+
+<!-- HUD Overlay -->
+<div id="hud" class="fixed inset-0 z-[5] pointer-events-none flex flex-col">
+  <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <b class="font-extrabold text-[15px] tracking-tight drop-shadow">ਕੰਚੇ KANCHE</b>
+      <span id="compBadge" class="hidden sm:inline-block text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-300/35 text-amber-200">VILLAGE</span>
+    </div>
+    <span id="elR" class="fifa-bar text-[11px] font-extrabold tracking-widest text-[#ffd479] px-3.5 py-1 rounded-full"></span>
+    <span class="flex gap-1.5 pointer-events-auto">
+      <button id="mute" class="glass w-[34px] h-[34px] rounded-full text-sm flex items-center justify-center" aria-label="Sound">🔊</button>
+      <button id="help" class="glass w-[34px] h-[34px] rounded-full font-extrabold text-[#ffd479] flex items-center justify-center" aria-label="How to play">?</button>
+    </span>
+  </div>
+
+  <!-- FIFA-Style Broadcast Match Scoreboard & Player Pills -->
+  <div id="pl" class="mt-2 flex flex-wrap items-center gap-1.5 max-w-[calc(100%-108px)]"></div>
+
+  <!-- Radar Minimap -->
+  <canvas id="mm" width="192" height="192" class="absolute right-2.5 top-[calc(52px+env(safe-area-inset-top))] w-24 h-24 rounded-full glass pointer-events-none shadow-xl"></canvas>
+
+  <!-- Live Commentary Banner -->
+  <div class="mt-auto flex justify-center pb-2">
+    <span id="stx" class="fifa-bar text-[12.5px] font-bold text-center rounded-2xl px-4 py-2 max-w-[min(92vw,500px)] leading-snug text-amber-100">Get ready…</span>
+  </div>
+
+  <!-- Single-Thumb Flick Joystick -->
+  <div id="jw" class="flex flex-col items-center gap-2">
+    <div id="jb" class="relative w-[148px] h-[148px] [@media(max-height:480px)]:w-28 [@media(max-height:480px)]:h-28 rounded-full border-2 border-amber-200/35 cursor-grab">
+      <div id="jk" class="absolute left-1/2 top-1/2 w-[60px] h-[60px] -ml-[30px] -mt-[30px] rounded-full pointer-events-none shadow-lg"></div>
+    </div>
+    <div id="jp" class="w-[130px] h-1.5 rounded-full bg-black/60 border border-amber-200/30 overflow-hidden"><i class="block h-full w-0"></i></div>
+  </div>
+</div>
+
+<div id="flash" class="fixed inset-0 z-[12] pointer-events-none opacity-0"></div>
+<div id="big" class="fixed left-1/2 top-[42%] z-[13] pointer-events-none opacity-0 text-[clamp(30px,10vw,60px)] font-black tracking-[.1em] text-[#ffd479] whitespace-nowrap"></div>
+
+<!-- Modal Dialog System -->
+<div id="modal" class="fixed inset-0 z-20 hidden items-center justify-center p-3 sm:p-4 backdrop-blur-md">
+  <div id="panel" class="panel w-[min(620px,100%)] max-h-[calc(100dvh-28px)] overflow-y-auto rounded-[22px] border border-amber-200/30 p-5"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const V=THREE.Vector3,mob=matchMedia('(pointer:coarse)').matches;
+const wait=ms=>new Promise(r=>setTimeout(r,ms)),rnd=(a,b)=>a+Math.random()*(b-a),cl=(v,a,b)=>Math.min(b,Math.max(a,v));
+const G=32,FR=3.4,R=.15,HR=.8,HD=.8,HIT=.4,SK=.34,FDT=1/120;
+const PC=[0xffc94a,0xe8453c,0x2f7fe0,0x35b45c],PN=['You','Ravi','Jaspreet','Gurdeep'];
+const PAL=[0xe8453c,0x2f7fe0,0x35b45c,0xf2b134,0x9b4ddb,0x18b8b0,0xe86aa8,0xf4f1e6,0xff8a3d,0x6a7ce0];
+const hex=c=>'#'+c.toString(16).padStart(6,'0');
+
+/* ---------- All 28 Indian States Roster ---------- */
+const STATES=[
+  {name:'Andhra Pradesh',code:'AP',code3:'AND',c1:0xf59e0b,c2:0x1e3a8a,zone:'South'},
+  {name:'Arunachal Pradesh',code:'AR',code3:'ARU',c1:0x0284c7,c2:0xfacc15,zone:'North-East'},
+  {name:'Assam',code:'AS',code3:'ASM',c1:0xdc2626,c2:0xfef08a,zone:'North-East'},
+  {name:'Bihar',code:'BR',code3:'BIH',c1:0xea580c,c2:0x1d4ed8,zone:'East'},
+  {name:'Chhattisgarh',code:'CG',code3:'CHG',c1:0x16a34a,c2:0xfacc15,zone:'Central'},
+  {name:'Goa',code:'GA',code3:'GOA',c1:0x0ea5e9,c2:0xffffff,zone:'West'},
+  {name:'Gujarat',code:'GJ',code3:'GUJ',c1:0xf97316,c2:0xffffff,zone:'West'},
+  {name:'Haryana',code:'HR',code3:'HAR',c1:0x2563eb,c2:0xfbbf24,zone:'North'},
+  {name:'Himachal Pradesh',code:'HP',code3:'HIM',c1:0x059669,c2:0xef4444,zone:'North'},
+  {name:'Jharkhand',code:'JH',code3:'JHA',c1:0x15803d,c2:0xf59e0b,zone:'East'},
+  {name:'Karnataka',code:'KA',code3:'KAR',c1:0xeab308,c2:0xdc2626,zone:'South'},
+  {name:'Kerala',code:'KL',code3:'KER',c1:0x10b981,c2:0xfef3c7,zone:'South'},
+  {name:'Madhya Pradesh',code:'MP',code3:'MAP',c1:0xd97706,c2:0x7c2d12,zone:'Central'},
+  {name:'Maharashtra',code:'MH',code3:'MAH',c1:0xf97316,c2:0x1e293b,zone:'West'},
+  {name:'Manipur',code:'MN',code3:'MAN',c1:0xe11d48,c2:0xffffff,zone:'North-East'},
+  {name:'Meghalaya',code:'ML',code3:'MEG',c1:0x0d9488,c2:0xfde047,zone:'North-East'},
+  {name:'Mizoram',code:'MZ',code3:'MIZ',c1:0x3b82f6,c2:0xef4444,zone:'North-East'},
+  {name:'Nagaland',code:'NL',code3:'NAG',c1:0x111827,c2:0xef4444,zone:'North-East'},
+  {name:'Odisha',code:'OD',code3:'ODI',c1:0xb91c1c,c2:0xfacc15,zone:'East'},
+  {name:'Punjab',code:'PB',code3:'PUN',c1:0xff8a00,c2:0x1e3a8a,zone:'North'},
+  {name:'Rajasthan',code:'RJ',code3:'RAJ',c1:0xec4899,c2:0xfbbf24,zone:'West'},
+  {name:'Sikkim',code:'SK',code3:'SIK',c1:0xf59e0b,c2:0xdc2626,zone:'North-East'},
+  {name:'Tamil Nadu',code:'TN',code3:'TAM',c1:0x991b1b,c2:0xfbbf24,zone:'South'},
+  {name:'Telangana',code:'TG',code3:'TEL',c1:0xdb2777,c2:0x1e293b,zone:'South'},
+  {name:'Tripura',code:'TR',code3:'TRI',c1:0xea580c,c2:0x15803d,zone:'North-East'},
+  {name:'Uttar Pradesh',code:'UP',code3:'UTP',c1:0x1d4ed8,c2:0xf97316,zone:'North'},
+  {name:'Uttarakhand',code:'UK',code3:'UTK',c1:0x047857,c2:0xffffff,zone:'North'},
+  {name:'West Bengal',code:'WB',code3:'WBG',c1:0xf8fafc,c2:0x2563eb,zone:'East'}
+];
+
+/* ---------- Complete 195 World Nations JSON Roster ---------- */
+const WORLD_COUNTRY_NAMES=[
+  "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria",
+  "Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan",
+  "Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia",
+  "Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo (Congo-Brazzaville)","Costa Rica",
+  "Côte d'Ivoire","Croatia","Cuba","Cyprus","Czechia","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic",
+  "Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland",
+  "France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea",
+  "Guinea-Bissau","Guyana","Haiti","Holy See","Honduras","Hungary","Iceland","India","Indonesia","Iran",
+  "Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati",
+  "Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania",
+  "Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius",
+  "Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia",
+  "Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway",
+  "Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland",
+  "Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino",
+  "Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands",
+  "Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland",
+  "Syria","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey",
+  "Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu",
+  "Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
+];
+
+/* Authentic Confederation, Broadcast 3-Letter Code, Colors & Base OVR Metadata */
+const WORLD_META={
+  "Afghanistan":{code3:"AFG",conf:"AFC",c1:0x000000,c2:0xd32011,ovr:76},
+  "Albania":{code3:"ALB",conf:"UEFA",c1:0xe41e20,c2:0x111111,ovr:79},
+  "Algeria":{code3:"ALG",conf:"CAF",c1:0x006633,c2:0xffffff,ovr:83},
+  "Argentina":{code3:"ARG",conf:"CONMEBOL",c1:0x75aadb,c2:0xffffff,ovr:95},
+  "Australia":{code3:"AUS",conf:"AFC",c1:0xffcd00,c2:0x00843d,ovr:86},
+  "Austria":{code3:"AUT",conf:"UEFA",c1:0xed2939,c2:0xffffff,ovr:84},
+  "Bangladesh":{code3:"BAN",conf:"AFC",c1:0x006a4e,c2:0xf42a41,ovr:77},
+  "Belgium":{code3:"BEL",conf:"UEFA",c1:0xe30613,c2:0xfdda24,ovr:90},
+  "Bhutan":{code3:"BHU",conf:"AFC",c1:0xff4e12,c2:0xffd520,ovr:72},
+  "Brazil":{code3:"BRA",conf:"CONMEBOL",c1:0xffdf00,c2:0x009c3b,ovr:96},
+  "Cameroon":{code3:"CMR",conf:"CAF",c1:0x007a5e,c2:0xce1126,ovr:82},
+  "Canada":{code3:"CAN",conf:"CONCACAF",c1:0xff0000,c2:0xffffff,ovr:84},
+  "Chile":{code3:"CHI",conf:"CONMEBOL",c1:0xd52b1e,c2:0x0039a6,ovr:83},
+  "China":{code3:"CHN",conf:"AFC",c1:0xde2910,c2:0xffde00,ovr:83},
+  "Colombia":{code3:"COL",conf:"CONMEBOL",c1:0xfcd116,c2:0x003893,ovr:88},
+  "Costa Rica":{code3:"CRC",conf:"CONCACAF",c1:0xce1126,c2:0x002b7f,ovr:80},
+  "Côte d'Ivoire":{code3:"CIV",conf:"CAF",c1:0xf77f00,c2:0x009e60,ovr:84},
+  "Croatia":{code3:"CRO",conf:"UEFA",c1:0xff0000,c2:0xffffff,ovr:89},
+  "Denmark":{code3:"DEN",conf:"UEFA",c1:0xc8102e,c2:0xffffff,ovr:86},
+  "Ecuador":{code3:"ECU",conf:"CONMEBOL",c1:0xffdd00,c2:0x034ea2,ovr:84},
+  "Egypt":{code3:"EGY",conf:"CAF",c1:0xce1126,c2:0x111111,ovr:84},
+  "France":{code3:"FRA",conf:"UEFA",c1:0x002395,c2:0xed2939,ovr:95},
+  "Germany":{code3:"GER",conf:"UEFA",c1:0xffffff,c2:0x111111,ovr:93},
+  "Ghana":{code3:"GHA",conf:"CAF",c1:0xffffff,c2:0xfcd116,ovr:81},
+  "Greece":{code3:"GRE",conf:"UEFA",c1:0x0d5eaf,c2:0xffffff,ovr:81},
+  "Hungary":{code3:"HUN",conf:"UEFA",c1:0xce2939,c2:0x477050,ovr:82},
+  "Iceland":{code3:"ISL",conf:"UEFA",c1:0x02529c,c2:0xdc1e35,ovr:78},
+  "India":{code3:"IND",conf:"AFC",c1:0xff9933,c2:0x138808,ovr:92},
+  "Indonesia":{code3:"IDN",conf:"AFC",c1:0xff0000,c2:0xffffff,ovr:79},
+  "Iran":{code3:"IRN",conf:"AFC",c1:0xffffff,c2:0x239f40,ovr:86},
+  "Iraq":{code3:"IRQ",conf:"AFC",c1:0x007a3d,c2:0xffffff,ovr:80},
+  "Ireland":{code3:"IRL",conf:"UEFA",c1:0x169b62,c2:0xff883e,ovr:80},
+  "Italy":{code3:"ITA",conf:"UEFA",c1:0x0066cc,c2:0xffffff,ovr:91},
+  "Jamaica":{code3:"JAM",conf:"CONCACAF",c1:0xfed100,c2:0x009b3a,ovr:79},
+  "Japan":{code3:"JPN",conf:"AFC",c1:0x00205b,c2:0xbc002d,ovr:90},
+  "Kenya":{code3:"KEN",conf:"CAF",c1:0xbb0000,c2:0x006600,ovr:76},
+  "Malaysia":{code3:"MAS",conf:"AFC",c1:0xffcc00,c2:0x010066,ovr:78},
+  "Mexico":{code3:"MEX",conf:"CONCACAF",c1:0x006847,c2:0xce1126,ovr:86},
+  "Morocco":{code3:"MAR",conf:"CAF",c1:0xc1272d,c2:0x006233,ovr:89},
+  "Nepal":{code3:"NEP",conf:"AFC",c1:0xdc143c,c2:0x003893,ovr:78},
+  "Netherlands":{code3:"NED",conf:"UEFA",c1:0xff6600,c2:0xffffff,ovr:92},
+  "New Zealand":{code3:"NZL",conf:"OFC",c1:0x111111,c2:0xffffff,ovr:81},
+  "Nigeria":{code3:"NGA",conf:"CAF",c1:0x008751,c2:0xffffff,ovr:85},
+  "Norway":{code3:"NOR",conf:"UEFA",c1:0xba0c2f,c2:0x00205b,ovr:84},
+  "Pakistan":{code3:"PAK",conf:"AFC",c1:0x01411c,c2:0xffffff,ovr:85},
+  "Paraguay":{code3:"PAR",conf:"CONMEBOL",c1:0xd52b1e,c2:0x0038a8,ovr:81},
+  "Peru":{code3:"PER",conf:"CONMEBOL",c1:0xffffff,c2:0xd91023,ovr:82},
+  "Philippines":{code3:"PHI",conf:"AFC",c1:0x0038a8,c2:0xce1126,ovr:76},
+  "Poland":{code3:"POL",conf:"UEFA",c1:0xffffff,c2:0xdc143c,ovr:84},
+  "Portugal":{code3:"POR",conf:"UEFA",c1:0xe42518,c2:0x006600,ovr:93},
+  "Qatar":{code3:"QAT",conf:"AFC",c1:0x8d1b3d,c2:0xffffff,ovr:81},
+  "Romania":{code3:"ROU",conf:"UEFA",c1:0xfcd116,c2:0x002b7f,ovr:81},
+  "Russia":{code3:"RUS",conf:"UEFA",c1:0xd52b1e,c2:0x0039a6,ovr:85},
+  "Saudi Arabia":{code3:"KSA",conf:"AFC",c1:0x006c35,c2:0xffffff,ovr:83},
+  "Senegal":{code3:"SEN",conf:"CAF",c1:0xffffff,c2:0x00853f,ovr:86},
+  "Serbia":{code3:"SRB",conf:"UEFA",c1:0xc6363c,c2:0x0c4076,ovr:84},
+  "Singapore":{code3:"SGP",conf:"AFC",c1:0xef3340,c2:0xffffff,ovr:76},
+  "South Africa":{code3:"RSA",conf:"CAF",c1:0xffb81c,c2:0x007749,ovr:82},
+  "South Korea":{code3:"KOR",conf:"AFC",c1:0xcd2e3a,c2:0x0047a0,ovr:89},
+  "Spain":{code3:"ESP",conf:"UEFA",c1:0xaa151b,c2:0xf1bf00,ovr:95},
+  "Sri Lanka":{code3:"SRI",conf:"AFC",c1:0x8d153a,c2:0xffbe29,ovr:79},
+  "Sweden":{code3:"SWE",conf:"UEFA",c1:0xfecc02,c2:0x006aa7,ovr:85},
+  "Switzerland":{code3:"SUI",conf:"UEFA",c1:0xd52b1e,c2:0xffffff,ovr:87},
+  "Thailand":{code3:"THA",conf:"AFC",c1:0x2d2a4a,c2:0xa51931,ovr:80},
+  "Turkey":{code3:"TUR",conf:"UEFA",c1:0xe30a17,c2:0xffffff,ovr:85},
+  "Ukraine":{code3:"UKR",conf:"UEFA",c1:0xffd700,c2:0x0057b7,ovr:84},
+  "United Arab Emirates":{code3:"UAE",conf:"AFC",c1:0xffffff,c2:0x00732f,ovr:80},
+  "United Kingdom":{code3:"GBR",conf:"UEFA",c1:0x012169,c2:0xc8102e,ovr:92},
+  "United States":{code3:"USA",conf:"CONCACAF",c1:0x0a3161,c2:0xb31942,ovr:88},
+  "Uruguay":{code3:"URU",conf:"CONMEBOL",c1:0x5bc2e7,c2:0x111111,ovr:90},
+  "Uzbekistan":{code3:"UZB",conf:"AFC",c1:0x0099b5,c2:0x1eb53a,ovr:81},
+  "Venezuela":{code3:"VEN",conf:"CONMEBOL",c1:0x800020,c2:0xfce300,ovr:82},
+  "Vietnam":{code3:"VIE",conf:"AFC",c1:0xda251d,c2:0xffff00,ovr:79}
+};
+
+/* Deterministic Confederation & Jersey Generator for all 195 Nations */
+const CONF_SETS={
+  AFC:new Set(["Afghanistan","Bahrain","Bangladesh","Bhutan","Brunei","Cambodia","China","India","Indonesia","Iran","Iraq","Japan","Jordan","Kuwait","Kyrgyzstan","Laos","Lebanon","Malaysia","Maldives","Mongolia","Myanmar","Nepal","North Korea","Oman","Pakistan","Palestine","Philippines","Qatar","Saudi Arabia","Singapore","South Korea","Sri Lanka","Syria","Tajikistan","Thailand","Timor-Leste","Turkmenistan","United Arab Emirates","Uzbekistan","Vietnam","Yemen"]),
+  CONMEBOL:new Set(["Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador","Paraguay","Peru","Uruguay","Venezuela"]),
+  CONCACAF:new Set(["Antigua and Barbuda","Bahamas","Barbados","Belize","Canada","Costa Rica","Cuba","Dominica","Dominican Republic","El Salvador","Grenada","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Trinidad and Tobago","United States"]),
+  OFC:new Set(["Australia","Fiji","Kiribati","Marshall Islands","Micronesia","Nauru","New Zealand","Palau","Papua New Guinea","Samoa","Solomon Islands","Tonga","Tuvalu","Vanuatu"]),
+  UEFA:new Set(["Albania","Andorra","Armenia","Austria","Azerbaijan","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czechia","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Holy See","Hungary","Iceland","Ireland","Israel","Italy","Kazakhstan","Latvia","Liechtenstein","Lithuania","Luxembourg","Malta","Moldova","Monaco","Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Turkey","Ukraine","United Kingdom"])
+};
+const AUTO_PALETTE=[[0xdc2626,0xfacc15],[0x2563eb,0xffffff],[0x16a34a,0xfef08a],[0xea580c,0x1e293b],[0x0284c7,0xfbbf24],[0x991b1b,0xffffff],[0x047857,0xf97316],[0x1d4ed8,0xef4444]];
+
+const COUNTRIES=WORLD_COUNTRY_NAMES.map((name,idx)=>{
+  const m=WORLD_META[name];
+  if(m)return{name,code3:m.code3,conf:m.conf,c1:m.c1,c2:m.c2,ovr:m.ovr};
+  let conf='CAF';
+  for(const [k,set] of Object.entries(CONF_SETS))if(set.has(name)){conf=k;break}
+  const clean=name.replace(/[^A-Za-z ]/g,'').trim().split(/\s+/);
+  const code3=clean.length>=3?(clean[0][0]+clean[1][0]+clean[2][0]).toUpperCase():clean.length===2?(clean[0].slice(0,2)+clean[1][0]).toUpperCase():clean[0].slice(0,3).toUpperCase();
+  const pal=AUTO_PALETTE[idx%AUTO_PALETTE.length];
+  return{name,code3,conf,c1:pal[0],c2:pal[1],ovr:64+(idx*7)%21};
+});
+
+const TEAM_MAP={};
+STATES.forEach(s=>TEAM_MAP[s.name]={...s,kind:'state',sub:s.zone+' Zone'});
+COUNTRIES.forEach(c=>TEAM_MAP[c.name]={...c,kind:'country',sub:c.conf});
+
+/* ---------- Solar System Planets & Moons Hierarchy (Tier 4 Cosmic Championship) ---------- */
+const SOLAR_SYSTEM_DATA={
+  "Mercury": [],
+  "Venus": [],
+  "Earth": ["Moon"],
+  "Mars": ["Phobos", "Deimos"],
+  "Jupiter": ["Io", "Europa", "Ganymede", "Callisto"],
+  "Saturn": ["Mimas", "Enceladus", "Tethys", "Dione", "Rhea", "Titan", "Hyperion", "Iapetus", "Phoebe"],
+  "Uranus": ["Miranda", "Ariel", "Umbriel", "Titania", "Oberon"],
+  "Neptune": ["Triton", "Proteus", "Nereid"]
+};
+
+const CELESTIAL_META={
+  "Mercury":{code3:"MER",c1:0x9ca3af,c2:0x4b5563,ovr:87,skyTop:"#1e1b2e",skyMid:"#4c3f54",skyBot:"#8c7a6b",fog:0x6e6058,tint:0xd6cfc7},
+  "Venus":{code3:"VEN",c1:0xf59e0b,c2:0x92400e,ovr:89,skyTop:"#451a03",skyMid:"#b45309",skyBot:"#f59e0b",fog:0xd97706,tint:0xffedd5},
+  "Earth":{code3:"EAR",c1:0x2563eb,c2:0x16a34a,ovr:94,skyTop:"#285b9c",skyMid:"#8fc0e6",skyBot:"#ecdcb4",fog:0xe2cca2,tint:0x8c6c43},
+  "Moon":{code3:"MON",c1:0xe5e7eb,c2:0x6b7280,ovr:82,skyTop:"#090d16",skyMid:"#1e293b",skyBot:"#64748b",fog:0x334155,tint:0x94a3b8},
+  "Mars":{code3:"MAR",c1:0xdc2626,c2:0x7f1d1d,ovr:91,skyTop:"#3b0d0c",skyMid:"#991b1b",skyBot:"#ea580c",fog:0xb45309,tint:0xb84a27},
+  "Phobos":{code3:"PHO",c1:0x9a3412,c2:0x431407,ovr:77},
+  "Deimos":{code3:"DEI",c1:0xb45309,c2:0x78350f,ovr:76},
+  "Jupiter":{code3:"JUP",c1:0xd97706,c2:0xfef3c7,ovr:97,skyTop:"#291509",skyMid:"#9a3412",skyBot:"#f59e0b",fog:0xc26d2d,tint:0xc8834b},
+  "Io":{code3:"IO",c1:0xfacc15,c2:0xb91c1c,ovr:85},
+  "Europa":{code3:"EUR",c1:0xe0f2fe,c2:0x0284c7,ovr:88},
+  "Ganymede":{code3:"GAN",c1:0x94a3b8,c2:0x334155,ovr:89},
+  "Callisto":{code3:"CAL",c1:0x64748b,c2:0x1e293b,ovr:86},
+  "Saturn":{code3:"SAT",c1:0xfbbf24,c2:0x78350f,ovr:96,skyTop:"#1c1408",skyMid:"#854d0e",skyBot:"#fde047",fog:0xb8923a,tint:0xc9a659},
+  "Mimas":{code3:"MIM",c1:0xd1d5db,c2:0x4b5563,ovr:78},
+  "Enceladus":{code3:"ENC",c1:0xf8fafc,c2:0x38bdf8,ovr:86},
+  "Tethys":{code3:"TET",c1:0xe2e8f0,c2:0x64748b,ovr:79},
+  "Dione":{code3:"DIO",c1:0xcbd5e1,c2:0x475569,ovr:80},
+  "Rhea":{code3:"RHE",c1:0x9ca3af,c2:0x374151,ovr:81},
+  "Titan":{code3:"TIT",c1:0xea580c,c2:0xfacc15,ovr:90},
+  "Hyperion":{code3:"HYP",c1:0xa8a29e,c2:0x57534e,ovr:77},
+  "Iapetus":{code3:"IAP",c1:0xf1f5f9,c2:0x1e293b,ovr:82},
+  "Phoebe":{code3:"PHB",c1:0x52525b,c2:0x18181b,ovr:76},
+  "Uranus":{code3:"URA",c1:0x22d3ee,c2:0x0e7490,ovr:92,skyTop:"#082f49",skyMid:"#0891b2",skyBot:"#a5f3fc",fog:0x22d3ee,tint:0x5bb5c4},
+  "Miranda":{code3:"MIR",c1:0x67e8f9,c2:0x155e75,ovr:80},
+  "Ariel":{code3:"ARI",c1:0xa5f3fc,c2:0x0891b2,ovr:82},
+  "Umbriel":{code3:"UMB",c1:0x475569,c2:0x0f172a,ovr:79},
+  "Titania":{code3:"TTN",c1:0x38bdf8,c2:0x1e3a8a,ovr:84},
+  "Oberon":{code3:"OBE",c1:0x0284c7,c2:0x172554,ovr:83},
+  "Neptune":{code3:"NEP",c1:0x1d4ed8,c2:0x1e1b4b,ovr:93,skyTop:"#090d29",skyMid:"#1e3a8a",skyBot:"#3b82f6",fog:0x1d4ed8,tint:0x3b66b8},
+  "Triton":{code3:"TRI",c1:0x60a5fa,c2:0xf472b6,ovr:87},
+  "Proteus":{code3:"PRO",c1:0x3b82f6,c2:0x1e293b,ovr:79},
+  "Nereid":{code3:"NER",c1:0x818cf8,c2:0x312e81,ovr:78}
+};
+
+const PLANET_NAMES=Object.keys(SOLAR_SYSTEM_DATA);
+const COSMIC_BODIES=[];
+PLANET_NAMES.forEach(planet=>{
+  const pm=CELESTIAL_META[planet];
+  const moons=SOLAR_SYSTEM_DATA[planet];
+  const entry={name:planet,type:'Planet',planet:planet,moons,code3:pm.code3,c1:pm.c1,c2:pm.c2,ovr:pm.ovr,sub:moons.length?`Planet · ${moons.length} Moon${moons.length>1?'s':''}`:'Planet · Solo System'};
+  COSMIC_BODIES.push(entry);
+  TEAM_MAP[planet]={...entry,kind:'cosmic'};
+  moons.forEach(moon=>{
+    const mm=CELESTIAL_META[moon]||{code3:moon.slice(0,3).toUpperCase(),c1:pm.c2,c2:pm.c1,ovr:80};
+    const mEntry={name:moon,type:'Moon',planet:planet,moons:[],code3:mm.code3,c1:mm.c1,c2:mm.c2,ovr:mm.ovr,sub:`Moon of ${planet}`};
+    COSMIC_BODIES.push(mEntry);
+    TEAM_MAP[moon]={...mEntry,kind:'cosmic'};
+  });
+});
+
+const teamObj=n=>TEAM_MAP[n]||{name:n,code3:n.slice(0,3).toUpperCase(),c1:0xffc94a,c2:0x1e293b,ovr:80,sub:'Contender'};
+const crestHTML=(n,sz='w-7 h-7 text-[10px]')=>{
+  const s=teamObj(n);
+  const light=s.c1===0xffffff||s.c1===0xf8fafc||s.c1===0xffdf00||s.c1===0xffcd00||s.c1===0xfcd116||s.c1===0xffdd00||s.c1===0xffd700||s.c1===0xfecc02||s.c1===0xfed100;
+  return `<span class="crest ${sz} shrink-0" style="background:linear-gradient(135deg,${hex(s.c1)} 52%,${hex(s.c2)} 52%);color:${light?'#0f172a':'#fff'};text-shadow:${light?'none':'0 1px 2px rgba(0,0,0,.85)'}">${s.code3}</span>`;
+};
+
+/* ---------- Audio ---------- */
+let ac,lastSnd=0,muted=0;
+function snd(f,d,v,type='triangle'){
+  if(muted)return;
+  const n=performance.now();if(n-lastSnd<38)return;lastSnd=n;
+  try{
+    ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;
+    o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(t+d);
+  }catch(e){}
+}
+function fanfare(){
+  if(muted)return;
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>setTimeout(()=>{lastSnd=0;snd(f,.28,.12,'sine')},i*95));
+}
+
+/* ---------- Terrain ---------- */
+function gh(x,z){
+  let h=.055*Math.sin(x*.62+1.3)+.045*Math.cos(z*.71-.6)+.035*Math.sin((x+z)*.44+2.1);
+  const d=Math.hypot(x,z);
+  if(d<HR)h-=HD*(1-Math.pow(d/HR,1.8));
+  else if(d<HR*2.6)h+=.05*Math.sin(Math.PI*Math.min(1,(d-HR)/(HR*1.6)));
+  return h;
+}
+
+/* ---------- High-Quality Three.js Scene & Golden-Hour Courtyard ---------- */
+const ren=new THREE.WebGLRenderer({canvas:$('#c')[0],antialias:true,powerPreference:'high-performance'});
+ren.setPixelRatio(Math.min(devicePixelRatio||1,2));ren.setSize(innerWidth,innerHeight,false);
+ren.shadowMap.enabled=true;ren.shadowMap.type=THREE.PCFSoftShadowMap;
+ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.14;ren.outputEncoding=THREE.sRGBEncoding;
+
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0xe2cca2,.024);
+
+function setSkyTheme(bodyName){
+  const host=TEAM_MAP[bodyName]&&TEAM_MAP[bodyName].planet?TEAM_MAP[bodyName].planet:bodyName;
+  const m=CELESTIAL_META[host]||CELESTIAL_META["Earth"];
+  const c=document.createElement('canvas');c.width=16;c.height=512;
+  const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,512);
+  [[0,m.skyTop||'#285b9c'],[.35,m.skyMid||'#8fc0e6'],[.72,m.skyBot||'#f6d49b'],[1,'#c98442']].forEach(s=>g.addColorStop(s[0],s[1]));
+  x.fillStyle=g;x.fillRect(0,0,16,512);
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;
+  if(scene.background&&scene.background.dispose)scene.background.dispose();
+  scene.background=t;
+  scene.fog.color.setHex(m.fog||0xe2cca2);
+  gMat.color.setHex(bodyName&&TEAM_MAP[bodyName]&&TEAM_MAP[bodyName].kind==='cosmic'?(m.tint||0xffffff):0xffffff);
+}
+
+scene.add(new THREE.HemisphereLight(0xfff0d4,0x6e4f2c,1.08));
+const sun=new THREE.DirectionalLight(0xffdca3,2.55);
+sun.castShadow=true;sun.shadow.mapSize.set(mob?1024:2048,mob?1024:2048);
+Object.assign(sun.shadow.camera,{left:-20,right:20,top:20,bottom:-20,near:1,far:80});
+sun.shadow.bias=-.0005;sun.shadow.normalBias=.02;scene.add(sun,sun.target);
+
+const rimLight=new THREE.DirectionalLight(0x9ec5ff,.55);
+rimLight.position.set(-10,8,-14);scene.add(rimLight);
+
+function groundTextures(){
+  const S=1024,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');
+  const bc=document.createElement('canvas');bc.width=bc.height=S;const bx=bc.getContext('2d');
+  x.fillStyle='#8c6c43';x.fillRect(0,0,S,S);
+  bx.fillStyle='#808080';bx.fillRect(0,0,S,S);
+  for(let i=0;i<26000;i++){
+    const px=Math.random()*S,py=Math.random()*S,pr=Math.random()*2.5+.4,hi=Math.random()>.48;
+    x.fillStyle=hi?`rgba(182,148,100,${.12+Math.random()*.2})`:`rgba(82,60,36,${.12+Math.random()*.22})`;
+    x.beginPath();x.arc(px,py,pr,0,6.3);x.fill();
+    bx.fillStyle=hi?'rgba(225,225,225,.24)':'rgba(35,35,35,.26)';
+    bx.beginPath();bx.arc(px,py,pr,0,6.3);bx.fill();
+  }
+  for(let i=0;i<280;i++){
+    const g=100+Math.random()*58;
+    x.fillStyle=`rgba(${g*.72|0},${g|0},${g*.42|0},${.06+Math.random()*.1})`;
+    x.beginPath();x.arc(Math.random()*S,Math.random()*S,Math.random()*36+8,0,6.3);x.fill();
+  }
+  const map=new THREE.CanvasTexture(c);map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(10,10);map.anisotropy=4;map.encoding=THREE.sRGBEncoding;
+  const bump=new THREE.CanvasTexture(bc);bump.wrapS=bump.wrapT=THREE.RepeatWrapping;bump.repeat.set(10,10);bump.anisotropy=4;
+  return{map,bump};
+}
+const gTex=groundTextures();
+const gMat=new THREE.MeshStandardMaterial({map:gTex.map,bumpMap:gTex.bump,bumpScale:.035,roughness:.94,metalness:.02});
+setSkyTheme('Earth');
+let gMesh=null;
+function buildGround(){
+  if(gMesh){scene.remove(gMesh);gMesh.geometry.dispose()}
+  const geo=new THREE.PlaneGeometry(52,52,mob?180:250,mob?180:250);geo.rotateX(-Math.PI/2);
+  const p=geo.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,gh(p.getX(i),p.getZ(i)));
+  geo.computeVertexNormals();
+  gMesh=new THREE.Mesh(geo,gMat);gMesh.receiveShadow=true;scene.add(gMesh);
+}
+
+const holeDisc=new THREE.Mesh(new THREE.CircleGeometry(HR*.64,32).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x140d05,roughness:1}));
+holeDisc.position.y=-HD+.02;scene.add(holeDisc);
+
+const pitRim=new THREE.Mesh(new THREE.RingGeometry(HR*.85,HR*1.08,36).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x5c4226,roughness:.95,transparent:true,opacity:.65}));
+pitRim.position.y=.02;pitRim.receiveShadow=true;scene.add(pitRim);
+
+const throwLine=new THREE.Mesh(new THREE.PlaneGeometry(3.4,.08).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xfff3d1,transparent:true,opacity:.55}));
+scene.add(throwLine);
+
+/* ---------- Punjabi Village Courtyard & Championship Arena Props ---------- */
+const tG=new THREE.Group();scene.add(tG);
+const canopies=[];
+const trunkM=new THREE.MeshStandardMaterial({color:0x52361d,roughness:.96});
+const leafM=[0x2c5c27,0x3b7a30,0x244a20,0x498536].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.86,flatShading:true}));
+const trunkG=new THREE.CylinderGeometry(.28,.48,1,8),leafG=new THREE.IcosahedronGeometry(1,1);
+
+function tree(x,z,s){
+  const g=new THREE.Group(),h=3.3*s,t=new THREE.Mesh(trunkG,trunkM);
+  t.scale.set(s,h,s);t.position.y=h/2;t.castShadow=true;g.add(t);
+  const crown=new THREE.Group();crown.position.y=h;
+  for(let i=0;i<6;i++){
+    const l=new THREE.Mesh(leafG,leafM[i%4]);l.scale.setScalar(rnd(1.45,2.35)*s);
+    l.position.set(rnd(-1.6,1.6)*s,rnd(-.2,1.6)*s,rnd(-1.6,1.6)*s);l.castShadow=true;crown.add(l);
+  }
+  g.add(crown);canopies.push({crown,ph:rnd(0,6.28)});
+  g.position.set(x,gh(x,z),z);tG.add(g);
+}
+
+function buildCourtyardProps(D){
+  const cp=new THREE.Group();
+  const wood=new THREE.MeshStandardMaterial({color:0x5c3818,roughness:.85});
+  const rope=new THREE.MeshStandardMaterial({color:0xd6b47c,roughness:.95});
+  const frame1=new THREE.Mesh(new THREE.BoxGeometry(2.3,.1,.1),wood);frame1.position.set(0,.48,-.52);
+  const frame2=new THREE.Mesh(new THREE.BoxGeometry(2.3,.1,.1),wood);frame2.position.set(0,.48,.52);
+  const frame3=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,1.14),wood);frame3.position.set(-1.1,.48,0);
+  const frame4=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,1.14),wood);frame4.position.set(1.1,.48,0);
+  const mat=new THREE.Mesh(new THREE.BoxGeometry(2.12,.05,.96),rope);mat.position.set(0,.49,0);mat.castShadow=true;
+  cp.add(frame1,frame2,frame3,frame4,mat);
+  [[-1.05,-.48],[1.05,-.48],[-1.05,.48],[1.05,.48]].forEach(([lx,lz])=>{
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.06,.05,.5,8),wood);leg.position.set(lx,.25,lz);leg.castShadow=true;cp.add(leg);
+  });
+  cp.position.set(-6.2,gh(-6.2,D*.35),D*.35);cp.rotation.y=.32;tG.add(cp);
+
+  const clay=new THREE.MeshStandardMaterial({color:0xa84b2b,roughness:.75});
+  const potBody=new THREE.Mesh(new THREE.SphereGeometry(.38,16,14),clay);potBody.position.y=.35;potBody.castShadow=true;
+  const potNeck=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,.18,14),clay);potNeck.position.y=.72;
+  const lid=new THREE.Mesh(new THREE.CylinderGeometry(.22,.18,.05,14),new THREE.MeshStandardMaterial({color:0xc96a44,roughness:.8}));lid.position.y=.82;
+  const matka=new THREE.Group();matka.add(potBody,potNeck,lid);
+  matka.position.set(5.4,gh(5.4,-2.4),-2.4);tG.add(matka);
+
+  // Festive Championship Corner Flags (colored after the two competing teams!)
+  if(S.players.length===2){
+    const t0=teamObj(S.players[0].name),t1=teamObj(S.players[1].name);
+    [[-3.8,t0.c1],[3.8,t1.c1]].forEach(([fx,fCol])=>{
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,1.6,8),new THREE.MeshStandardMaterial({color:0xd4af37,metalness:.6,roughness:.3}));
+      pole.position.y=.8;pole.castShadow=true;
+      const flag=new THREE.Mesh(new THREE.BoxGeometry(.55,.32,.02),new THREE.MeshStandardMaterial({color:fCol,roughness:.6}));
+      flag.position.set(fx<0?.28:-.28,1.38,0);
+      const fg=new THREE.Group();fg.add(pole,flag);fg.position.set(fx,gh(fx,0),0);tG.add(fg);
+    });
+  }
+
+  const grassM=new THREE.MeshStandardMaterial({color:0x4b7d2c,roughness:.9,flatShading:true});
+  const bladeG=new THREE.ConeGeometry(.07,.32,4);
+  for(let i=0;i<55;i++){
+    const gx=rnd(-13,13),gz=rnd(-8,D+5);
+    if(Math.abs(gx)<2.6&&gz>-1.5&&gz<D+1.5)continue;
+    const tuft=new THREE.Group();
+    for(let b=0;b<3;b++){
+      const bl=new THREE.Mesh(bladeG,grassM);
+      bl.position.set(rnd(-.08,.08),.14,rnd(-.08,.08));
+      bl.rotation.set(rnd(-.3,.3),rnd(0,6),rnd(-.3,.3));
+      tuft.add(bl);
+    }
+    tuft.position.set(gx,gh(gx,gz),gz);tG.add(tuft);
+  }
+}
+
+function buildVillage(D){
+  tG.clear();canopies.length=0;
+  throwLine.position.set(0,gh(0,D)+.015,D);
+  for(let i=0;i<9;i++)tree(-18+i*4.5+rnd(-1,1),-7-rnd(0,6),rnd(1.15,1.75));
+  for(let i=0;i<6;i++){const z=-2+i*(D+8)/5;tree(-(9.2+rnd(0,4)),z,rnd(1.05,1.55));tree(9.2+rnd(0,4),z,rnd(1.05,1.55))}
+  const w=new THREE.Mesh(new THREE.BoxGeometry(46,1.65,.55),new THREE.MeshStandardMaterial({color:0xb88954,bumpMap:gTex.bump,bumpScale:.02,roughness:.96}));
+  w.position.set(0,.78,-18);w.receiveShadow=true;tG.add(w);
+  buildCourtyardProps(D);
+}
+
+const dustCount=120,dustGeo=new THREE.BufferGeometry(),dustPos=new Float32Array(dustCount*3);
+for(let i=0;i<dustCount;i++){dustPos[i*3]=rnd(-10,10);dustPos[i*3+1]=rnd(.3,4.5);dustPos[i*3+2]=rnd(-5,15)}
+dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
+const dustPts=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xffe6a3,size:.065,transparent:true,opacity:.45,depthWrite:false}));
+scene.add(dustPts);
+
+/* ---------- Glass Marbles with Swirl Cat's-Eye Core + Contact Shadow ---------- */
+const mtc={};
+function mmat(col){
+  if(!mtc[col]){
+    const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+    x.fillStyle=hex(col);x.fillRect(0,0,128,128);
+    x.lineWidth=11;x.strokeStyle='rgba(255,255,255,.82)';
+    for(let i=0;i<3;i++){x.beginPath();x.arc(rnd(16,112),rnd(16,112),rnd(24,56),rnd(0,6),rnd(0,6)+2.2);x.stroke()}
+    x.lineWidth=5;x.strokeStyle='rgba(255,245,190,.65)';
+    x.beginPath();x.moveTo(0,64);x.bezierCurveTo(42,20,86,108,128,64);x.stroke();
+    const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;
+    mtc[col]=new THREE.MeshPhysicalMaterial({map:t,roughness:.08,metalness:.04,clearcoat:1,clearcoatRoughness:.04,reflectivity:1});
+  }
+  return mtc[col];
+}
+const mGeo=new THREE.SphereGeometry(R,24,18),mGrp=new THREE.Group();scene.add(mGrp);
+const shGeo=new THREE.CircleGeometry(R*1.25,16).rotateX(-Math.PI/2);
+const shMat=new THREE.MeshBasicMaterial({color:0x120a03,transparent:true,opacity:.36,depthWrite:false});
+
+function mk(col){
+  const mesh=new THREE.Mesh(mGeo,mmat(col));mesh.castShadow=true;
+  const sh=new THREE.Mesh(shGeo,shMat);
+  mGrp.add(mesh,sh);
+  return{col,mesh,sh,pos:new V(),vel:new V(),inHole:false,frozen:true};
+}
+const kill=m=>{mGrp.remove(m.mesh);mGrp.remove(m.sh)};
+
+/* ---------- Game State ---------- */
+const S={phase:'setup',players:[],marbles:[],shot:null,target:null,hit:false,round:0,thrower:0,D:6,max:6,c:4,mode:'quick'};
+const maxSpeed=()=>3*Math.sqrt(S.D)+1.6,camBase=new V(),look=new V(),lookBase=new V();let fovK=0;
+const cam=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,200);
+
+function fitCamera(){
+  const D=S.D,a=innerWidth/innerHeight;let back=3.6+D*.78,up=2.35+D*.34;
+  if(a<1){const f=Math.pow(1/a,.62);back*=f;up*=f}
+  camBase.set(0,up,D+back);lookBase.set(0,.15,D*.4);look.copy(lookBase);cam.position.copy(camBase);cam.lookAt(look);
+  sun.target.position.set(0,0,D*.5);sun.target.updateMatrixWorld();sun.position.set(9,16,D*.5+8);
+}
+
+/* ---------- Physics (100% Preserved Core Mechanics) ---------- */
+function stepMarble(m,dt){
+  if(m.frozen){
+    m.sh.position.set(m.pos.x,gh(m.pos.x,m.pos.z)+.008,m.pos.z);
+    return;
+  }
+  const gy=gh(m.pos.x,m.pos.z)+R,dh=Math.hypot(m.pos.x,m.pos.z),hs=Math.hypot(m.vel.x,m.vel.z);
+  if(!m.inHole&&(m.pos.y<-.15||(dh<HR*.52&&hs<4.2)))m.inHole=true;
+  if(m.inHole)m.vel.multiplyScalar(Math.max(0,1-7*dt));
+  if(m.pos.y>gy+.004){
+    m.vel.y-=G*dt;m.pos.addScaledVector(m.vel,dt);
+    const g2=gh(m.pos.x,m.pos.z)+R;
+    if(m.pos.y<=g2){m.pos.y=g2;if(m.vel.y<0){m.vel.y=-m.vel.y*.34;if(m.vel.y<.55)m.vel.y=0}m.vel.x*=.87;m.vel.z*=.87}
+  }else{
+    m.pos.y=gy;if(m.vel.y<0)m.vel.y=0;
+    const e=.06,hx=(gh(m.pos.x+e,m.pos.z)-gh(m.pos.x-e,m.pos.z))/(2*e),hz=(gh(m.pos.x,m.pos.z+e)-gh(m.pos.x,m.pos.z-e))/(2*e);
+    m.vel.x-=G*hx*dt*SK;m.vel.z-=G*hz*dt*SK;
+    const sp=Math.hypot(m.vel.x,m.vel.z);
+    if(sp>1e-5){const k=Math.max(0,sp-FR*dt)/sp;m.vel.x*=k;m.vel.z*=k}
+    m.pos.x+=m.vel.x*dt;m.pos.z+=m.vel.z*dt;
+    const g3=gh(m.pos.x,m.pos.z)+R;if(m.pos.y<g3)m.pos.y=g3;
+  }
+  const s2=Math.hypot(m.vel.x,m.vel.z);
+  if(s2>.02){const ax=new V(m.vel.z,0,-m.vel.x).normalize();m.mesh.rotateOnWorldAxis(ax,s2*dt/R)}
+  m.mesh.position.copy(m.pos);
+  m.sh.position.set(m.pos.x,gh(m.pos.x,m.pos.z)+.008,m.pos.z);
+}
+function collide(a,b){
+  const dx=b.pos.x-a.pos.x,dz=b.pos.z-a.pos.z,md=2*R,d2=dx*dx+dz*dz;
+  if(d2>md*md||Math.abs(b.pos.y-a.pos.y)>md)return;
+  const d=Math.sqrt(d2)||1e-5,nx=dx/d,nz=dz/d,o=(md-d)/2;
+  a.pos.x-=nx*o;a.pos.z-=nz*o;b.pos.x+=nx*o;b.pos.z+=nz*o;
+  const df=(b.vel.x*nx+b.vel.z*nz)-(a.vel.x*nx+a.vel.z*nz);
+  if(Math.abs(df)>.5)snd(1300+rnd(0,600),.07,Math.min(.14,Math.abs(df)*.02));
+  a.vel.x+=df*nx;a.vel.z+=df*nz;b.vel.x-=df*nx;b.vel.z-=df*nz;
+}
+let acc=0;
+function physics(dt){
+  acc+=dt;let n=0;
+  while(acc>=FDT&&n<8){
+    acc-=FDT;n++;const L=S.marbles;
+    for(const m of L)stepMarble(m,FDT);
+    for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++)collide(L[i],L[j]);
+    if(S.phase==='shooting'&&S.target&&S.shot&&!S.hit&&Math.hypot(S.shot.pos.x-S.target.pos.x,S.shot.pos.z-S.target.pos.z)<HIT){
+      S.hit=true;flash();big('HIT!');snd(660,.25,.18);navigator.vibrate&&navigator.vibrate(60);fovK=1;
+    }
+  }
+  if(n>=8)acc=0;
+}
+function settle(max=5500){
+  return new Promise(res=>{const t0=performance.now();
+    const f=()=>{const mv=S.marbles.some(m=>!m.inHole&&(Math.hypot(m.vel.x,m.vel.z)>.28||Math.abs(m.vel.y)>.6));
+      if(!mv||performance.now()-t0>max)res();else requestAnimationFrame(f)};
+    requestAnimationFrame(f)});
+}
+
+/* ---------- FIFA-Style Broadcast HUD ---------- */
+const say=t=>$('#stx').text(t);
+const retrig=(s,c='go')=>{const e=$(s).removeClass(c);void e[0].offsetWidth;e.addClass(c)};
+const flash=()=>retrig('#flash'),big=t=>{$('#big').text(t);retrig('#big')};
+
+function hud(){
+  $('#elR').text(`RND ${Math.min(S.round,S.max)}/${S.max} · POT ${S.marbles.length}`);
+  const badge=$('#compBadge');
+  if(S.mode==='cosmic'){badge.removeClass('hidden').text('🪐 SOLAR SYSTEM CHAMPIONSHIP')}
+  else if(S.mode==='world'){badge.removeClass('hidden').text('🌍 WORLD CHAMPIONSHIP')}
+  else if(S.mode==='india'){badge.removeClass('hidden').text('🇮🇳 ALL-INDIA CHAMPIONSHIP')}
+  else if(S.mode==='district'){badge.removeClass('hidden').text('🏆 PUNJAB DISTRICT CUP')}
+  else{badge.addClass('hidden')}
+
+  if((S.mode==='cosmic'||S.mode==='world'||S.mode==='india'||S.mode==='district')&&S.players.length===2){
+    const [p0,p1]=S.players;
+    const s0=teamObj(p0.name),s1=teamObj(p1.name);
+    $('#pl').html(`
+      <div class="fifa-bar flex items-center rounded-xl overflow-hidden text-[12px] font-black shadow-xl">
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 transition ${S.thrower===0?'bg-amber-400/25':'opacity-75'}" style="border-left:4px solid ${hex(s0.c1)}">
+          <span class="text-white tracking-wider">${s0.code3}</span>
+          <span class="px-1.5 py-0.5 rounded bg-black/65 text-[#ffd479] text-[13px]">${p0.marbles}</span>
+        </div>
+        <div class="px-2 py-1 text-[10px] font-extrabold text-amber-200/75 bg-black/55 border-x border-white/10">VS</div>
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 transition ${S.thrower===1?'bg-amber-400/25':'opacity-75'}" style="border-right:4px solid ${hex(s1.c1)}">
+          <span class="px-1.5 py-0.5 rounded bg-black/65 text-[#ffd479] text-[13px]">${p1.marbles}</span>
+          <span class="text-white tracking-wider">${s1.code3}</span>
+        </div>
+      </div>
+    `);
+  }else{
+    $('#pl').html(S.players.map((p,i)=>`<div class="glass flex items-center gap-1.5 rounded-full py-1 pl-1.5 pr-2.5 text-[11px] font-bold transition ${i===S.thrower?'opacity-100 !border-[#ffd479] shadow-[0_0_14px_rgba(255,180,60,.35)]':'opacity-60'}"><i class="w-[9px] h-[9px] rounded-full" style="background:${hex(p.color)};box-shadow:0 0 8px ${hex(p.color)}"></i>${p.name}<b>${p.marbles}</b></div>`).join(''));
+  }
+}
+$('#mute').on('click',function(){muted=!muted;$(this).text(muted?'🔇':'🔊')});
+
+/* ---------- Aim Guide ---------- */
+const aimG=new THREE.BufferGeometry();aimG.setAttribute('position',new THREE.BufferAttribute(new Float32Array(27*3),3));
+const aimL=new THREE.Line(aimG,new THREE.LineDashedMaterial({color:0xffe066,dashSize:.16,gapSize:.1,depthTest:false,transparent:true}));
+aimL.frustumCulled=false;aimL.renderOrder=10;aimL.visible=false;scene.add(aimL);
+const ringM=r=>{const m=new THREE.Mesh(new THREE.RingGeometry(r,r*1.45,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffe066,transparent:true,opacity:.7,side:2,depthTest:false}));m.renderOrder=11;m.visible=false;scene.add(m);return m};
+const aimRing=ringM(.22),selRing=ringM(.25);selRing.material.color.set(0xff5a3c);
+
+/* ---------- Joystick ---------- */
+const J=$('#jb'),K=$('#jk'),PW=$('#jp i'),elJw=$('#jw')[0],jv={x:0,y:0};let joyOn=false,joyId=null;
+function joySet(e){
+  const r=J[0].getBoundingClientRect(),mx=r.width*.36;
+  let dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;const l=Math.hypot(dx,dy);
+  if(l>mx){dx*=mx/l;dy*=mx/l}
+  K.css('transform',`translate(${dx}px,${dy}px)`);jv.x=dx/mx;jv.y=dy/mx;PW.css('width',Math.min(1,Math.hypot(jv.x,jv.y))*100+'%');
+}
+const joyReset=()=>{jv.x=jv.y=0;K.css('transform','');PW.css('width',0)};
+J.on('pointerdown',e=>{if(S.phase!=='aim')return;e=e.originalEvent;e.preventDefault();joyOn=true;joyId=e.pointerId;try{J[0].setPointerCapture(joyId)}catch(_){}joySet(e)})
+ .on('pointermove',e=>{e=e.originalEvent;if(joyOn&&e.pointerId===joyId){e.preventDefault();joySet(e)}})
+ .on('pointerup pointercancel',e=>{e=e.originalEvent;if(!joyOn||e.pointerId!==joyId)return;joyOn=false;Math.hypot(jv.x,jv.y)>.1&&S.phase==='aim'?fire():joyReset()});
+
+function assist(o,dir){
+  let best=null,ba=.075;
+  for(const m of S.marbles){if(m===S.shot||m.inHole)continue;
+    const dx=m.pos.x-o.x,dz=m.pos.z-o.z,d=Math.hypot(dx,dz);if(d<.35)continue;
+    const a=Math.acos(cl((dx*dir.x+dz*dir.z)/d,-1,1));if(a<ba){ba=a;best=m}}
+  if(!best)return dir;
+  const dx=best.pos.x-o.x,dz=best.pos.z-o.z,d=Math.hypot(dx,dz);
+  return dir.clone().lerp(new V(dx/d,0,dz/d),.68).normalize();
+}
+function guide(){
+  const mag=Math.hypot(jv.x,jv.y);
+  if(S.phase!=='aim'||!S.shot||mag<.09){aimL.visible=aimRing.visible=false;return}
+  const o=S.shot.pos,dir=assist(o,new V(jv.x/mag,0,jv.y/mag)),sp=Math.min(1,mag)*maxSpeed(),tot=sp*sp/(2*FR),pa=aimG.attributes.position;
+  let ex=0,ey=0,ez=0;
+  for(let i=0;i<27;i++){const d=tot*i/26,x=o.x+dir.x*d,z=o.z+dir.z*d,y=gh(x,z)+.06;pa.setXYZ(i,x,y,z);ex=x;ey=y;ez=z}
+  pa.needsUpdate=true;aimL.computeLineDistances();aimL.visible=true;aimRing.position.set(ex,ey,ez);aimRing.visible=true;
+}
+
+/* ---------- 3D Players with Team Jerseys ---------- */
+const kids=[],SKIN=[0xc68642,0xa9713d,0xd9a066,0x8d5a2b],PAT=[0xff6a00,0x1f4fd8,0xf2f2f2,0x111111],SLOT=[[-2.2,0],[2.2,0],[-3.6,.6],[3.6,.6]];
+function kid(i,jerseyCol,turbanCol){
+  const g=new THREE.Group(),M=(c,r=.85)=>new THREE.MeshStandardMaterial({color:c,roughness:r}),
+   P=(geo,mat,x,y,z,par)=>{const p=new THREE.Mesh(geo,mat);p.position.set(x,y,z);p.castShadow=true;(par||g).add(p)},
+   piv=(x,y,z,par)=>{const q=new THREE.Group();q.position.set(x,y,z);(par||g).add(q);return q};
+  const legs=[-1,1].map(s=>{const q=piv(s*.13,.6,0);P(new THREE.CylinderGeometry(.09,.075,.6,8),M(0x233054),0,-.3,0,q);return q});
+  const body=piv(0,.6,0);
+  P(new THREE.CylinderGeometry(.19,.16,.6,10),M(jerseyCol||PC[i]),0,.32,0,body);
+  P(new THREE.SphereGeometry(.16,14,12),M(SKIN[i%4],.6),0,.78,0,body);
+  P(new THREE.SphereGeometry(.17,12,8,0,6.3,0,1.45),M(turbanCol||PAT[i%4]),0,.8,0,body);
+  const arms=[-1,1].map(s=>{const q=piv(s*.24,.56,0,body);P(new THREE.CylinderGeometry(.05,.045,.46,8),M(SKIN[i%4],.6),0,-.23,0,q);return q});
+  g.scale.setScalar(1.7);scene.add(g);
+  return{g,legs,body,arms,x:0,z:0,yaw:0,flick:0,cr:0,i};
+}
+function spawnKids(){
+  kids.forEach(k=>scene.remove(k.g));kids.length=0;
+  S.players.forEach((p,i)=>{
+    const tm=TEAM_MAP[p.name];
+    const jCol=tm?tm.c1:p.color;
+    const tCol=tm?tm.c2:PAT[i%4];
+    const k=kid(i,jCol,tCol);
+    k.x=SLOT[i][0]*1.5;k.z=S.D+9+i;kids.push(k);
+  });
+}
+let prevPh='';
+function animKids(t,dt){
+  const fl=prevPh!=='shooting'&&S.phase==='shooting';prevPh=S.phase;
+  kids.forEach((k,i)=>{
+    const th=i===S.thrower,aim=th&&(S.phase==='aim'||S.phase==='shooting'),win=th&&S.phase==='resolve'&&S.hit;
+    const tx=aim?-.95:SLOT[i][0],tz=S.D+(aim?.5:.4+SLOT[i][1]),dx=tx-k.x,dz=tz-k.z,d=Math.hypot(dx,dz),mv=d>.05;
+    if(mv){const st=Math.min(d,2.4*dt);k.x+=dx/d*st;k.z+=dz/d*st}
+    const ly=aim?S.D:0,ty=mv?Math.atan2(-dx,-dz):Math.atan2(k.x,k.z-ly);
+    k.yaw+=(((ty-k.yaw+Math.PI)%6.2832+6.2832)%6.2832-Math.PI)*Math.min(1,dt*8);
+    k.cr+=((aim&&!mv?1:0)-k.cr)*Math.min(1,dt*6);
+    if(fl&&th)k.flick=1;k.flick=Math.max(0,k.flick-dt*3.5);
+    const sw=mv?Math.sin(t*10)*.7:0,c=k.cr;
+    k.legs[0].rotation.x=sw+1.1*c;k.legs[1].rotation.x=-sw+1.1*c;
+    k.body.rotation.x=win?0:-.8*c;k.body.position.y=.6+Math.sin(t*2+i)*.012;
+    k.arms[0].rotation.x=win?3:-sw*.8+.9*c;
+    k.arms[1].rotation.x=win?3:sw*.8+1.5*c+.5*Math.sin(k.flick*Math.PI);
+    k.g.position.set(k.x,gh(k.x,k.z)-.5*c+(win?Math.abs(Math.sin(t*9))*.5:0),k.z);k.g.rotation.y=k.yaw;
+  });
+}
+
+/* ---------- Radar Minimap ---------- */
+const rc=$('#mm')[0].getContext('2d');
+function radar(){
+  const W=192,c=W/2,sc=W*.8/(S.D+3),X=x=>c+x*sc,Z=z=>c+(z-S.D/2)*sc;
+  rc.clearRect(0,0,W,W);rc.save();rc.beginPath();rc.arc(c,c,c-2,0,6.3);rc.clip();
+  rc.fillStyle='rgba(75,54,28,.88)';rc.fillRect(0,0,W,W);
+  rc.fillStyle='#120b04';rc.beginPath();rc.arc(X(0),Z(0),HR*sc,0,6.3);rc.fill();
+  rc.strokeStyle='rgba(255,212,121,.65)';rc.lineWidth=2;rc.beginPath();rc.moveTo(X(-1.5),Z(S.D));rc.lineTo(X(1.5),Z(S.D));rc.stroke();
+  for(const m of S.marbles){if(m.inHole)continue;const x=X(m.pos.x),y=Z(m.pos.z);
+    rc.fillStyle=hex(m.col);rc.beginPath();rc.arc(x,y,4,0,6.3);rc.fill();
+    if(m===S.target||m===S.shot){rc.strokeStyle=m===S.target?'#ff5a3c':'#fff';rc.lineWidth=2.5;rc.beginPath();rc.arc(x,y,8,0,6.3);rc.stroke()}}
+  rc.restore();
+}
+
+/* ---------- Round Flow ---------- */
+function launch(m){
+  const a=Math.random()*6.283;let r,tx,tz;
+  if(Math.random()<.42)r=Math.random()*HR*.8;else r=HR*1.15+Math.random()*Math.random()*2.6;
+  tx=Math.cos(a)*r;tz=Math.sin(a)*r;
+  const dx=tx-m.pos.x,dz=tz-m.pos.z,d=Math.hypot(dx,dz)||.01,sp=Math.sqrt(2*FR*Math.max(.35,d*rnd(.94,1.06)));
+  m.vel.set(dx/d*sp,0,dz/d*sp);m.frozen=false;
+}
+async function doThrow(){
+  S.phase='throw';say('Throwing the pot at the pit…');
+  const pot=S.marbles;
+  pot.forEach((m,i)=>{const a=i/Math.max(1,pot.length)*6.283+rnd(-.2,.2),r=.2+Math.random()*.35,x=Math.cos(a)*r,z=S.D+Math.sin(a)*r*.7;
+    m.pos.set(x,gh(x,z)+R,z);m.vel.set(0,0,0);m.inHole=false;m.frozen=true;m.mesh.position.copy(m.pos);m.sh.position.set(x,gh(x,z)+.008,z)});
+  await wait(650);S.phase='flying';
+  for(const m of pot){launch(m);await wait(52)}
+  await settle(5500);
+}
+const loose=()=>S.marbles.filter(m=>!m.inHole);
+function hardest(){
+  const L=loose();let best=null,bs=-1e9;
+  for(const m of L){
+    let nb=0;for(const o of L)if(o!==m&&Math.hypot(o.pos.x-m.pos.x,o.pos.z-m.pos.z)<.6)nb++;
+    const sc=(S.D-m.pos.z)+nb*.85+Math.max(0,1.4-Math.hypot(m.pos.x,m.pos.z))*.9;
+    if(sc>bs){bs=sc;best=m}}
+  return best;
+}
+function pickAt(cx,cy){
+  let best=null,bd=68;
+  for(const m of loose()){const p=m.pos.clone().project(cam);if(p.z>1)continue;
+    const d=Math.hypot((p.x*.5+.5)*innerWidth-cx,(-p.y*.5+.5)*innerHeight-cy);if(d<bd){bd=d;best=m}}
+  return best;
+}
+let pickRes=null;
+$('#c').on('pointerdown',e=>{if(S.phase!=='target'||!pickRes)return;const m=pickAt(e.clientX,e.clientY);if(m){const r=pickRes;pickRes=null;selRing.visible=false;r(m)}});
+$('#c').on('pointermove',e=>{if(S.phase!=='target'||!pickRes)return;const m=pickAt(e.clientX,e.clientY)||hardest();selRing.visible=!!m;if(m)selRing.position.set(m.pos.x,gh(m.pos.x,m.pos.z)+.03,m.pos.z)});
+function humanPick(){
+  return new Promise(res=>{pickRes=res;const h=hardest();if(h){selRing.visible=true;selRing.position.set(h.pos.x,gh(h.pos.x,h.pos.z)+.03,h.pos.z)}
+    say(`Tap the hardest marble you want ${S.players[S.thrower].name} to hit`)});
+}
+function beginAim(){
+  S.phase='aim';joyReset();
+  const tm=TEAM_MAP[S.players[S.thrower].name];
+  const m=mk(tm?tm.c1:PC[S.thrower]);m.pos.set(0,gh(0,S.D)+R,S.D);m.mesh.position.copy(m.pos);
+  S.marbles.push(m);S.shot=m;S.hit=false;
+}
+function fire(){
+  const mag=Math.hypot(jv.x,jv.y);if(S.phase!=='aim'||!S.shot||mag<.09)return;
+  const d=assist(S.shot.pos,new V(jv.x/mag,0,jv.y/mag)),sp=cl(mag,.05,1)*maxSpeed();
+  S.shot.vel.set(d.x*sp,0,d.z*sp);S.shot.frozen=false;S.phase='shooting';
+  elJw.classList.remove('on');aimL.visible=aimRing.visible=false;say('Flicked!');snd(300,.12,.15);
+}
+function aiShot(){
+  const m=S.shot,t=S.target,dx=t.pos.x-m.pos.x,dz=t.pos.z-m.pos.z,need=Math.sqrt(2*FR*Math.max(.4,Math.hypot(dx,dz)));
+  const ang=Math.atan2(dx,dz)+rnd(-.012,.012)*AIQ,sp=need*(1+rnd(-.09,.09)*AIQ);
+  m.vel.set(Math.sin(ang)*sp,0,Math.cos(ang)*sp);m.frozen=false;S.phase='shooting';snd(300,.12,.15);
+}
+function humanShot(){
+  return new Promise(res=>{const t0=performance.now();
+    const f=()=>{if(S.phase!=='aim'||performance.now()-t0>45000){
+        if(S.phase==='aim'){const t=S.target,s=S.shot,l=Math.hypot(t.pos.x-s.pos.x,t.pos.z-s.pos.z)||1;jv.x=(t.pos.x-s.pos.x)/l*.7;jv.y=(t.pos.z-s.pos.z)/l*.7;fire()}
+        res()}else requestAnimationFrame(f)};
+    requestAnimationFrame(f)});
+}
+async function resolveRound(){
+  S.phase='resolve';
+  const sh=S.shot;if(sh){kill(sh);S.marbles=S.marbles.filter(m=>m!==sh);S.shot=null}
+  const inH=S.marbles.filter(m=>m.inHole),th=S.players[S.thrower];
+  if(S.hit){
+    big('POT WON');flash();const n=S.marbles.length;th.marbles+=n;
+    say(`${th.name} hit the target and scoops the whole pot — ${n} marbles!`);
+    S.marbles.forEach(m=>m.frozen=true);await wait(700);S.marbles.forEach(kill);S.marbles=[];
+  }else{
+    big('MISS');
+    say(inH.length?`${th.name} missed — but keeps the ${inH.length} marble${inH.length>1?'s':''} that dropped in the pit.`:`${th.name} missed — and nothing fell in the pit.`);
+    th.marbles+=inH.length;inH.forEach(kill);S.marbles=S.marbles.filter(m=>!m.inHole);
+    S.marbles.forEach(m=>m.frozen=true);await wait(750);
+  }
+  hud();await wait(1200);
+}
+let running=false;
+async function play(){
+  if(running)return;running=true;
+  while(S.round<S.max&&S.players.filter(p=>p.marbles>0).length>1){
+    S.round++;hud();big('ROUND '+S.round);
+    for(const p of S.players){const n=Math.min(S.c,p.marbles);p.marbles-=n;for(let i=0;i<n;i++)S.marbles.push(mk(PAL[Math.random()*PAL.length|0]))}
+    hud();if(!S.marbles.length)break;
+    await doThrow();
+    const th=S.players[S.thrower];let target=null;
+    if(loose().length){
+      S.phase='target';const ds=S.players[(S.thrower+1)%S.players.length];
+      if(ds.isHuman)target=await humanPick();else{say(`${ds.name} is sizing up the hardest marble…`);await wait(900);target=hardest()}
+    }
+    if(!target){
+      const inH=S.marbles.filter(m=>m.inHole);th.marbles+=inH.length;S.marbles.forEach(kill);S.marbles=[];
+      say(`Everything dropped in the pit — ${th.name} keeps ${inH.length}.`);hud();await wait(1400);
+    }else{
+      S.target=target;selRing.visible=false;beginAim();
+      if(th.isHuman){elJw.classList.add('on');say('Your flick — drag the circle toward the target, release to shoot');await humanShot()}
+      else{say(`${th.name} is lining up the shot…`);await wait(950);aiShot()}
+      await settle(6000);await resolveRound();S.target=null;
+    }
+    let g=0;do{S.thrower=(S.thrower+1)%S.players.length}while(S.players[S.thrower].marbles<=0&&++g<8);
+    hud();await wait(280);
+  }
+  running=false;endGame();
+}
+
+/* ---------- UI Helpers & Screens ---------- */
+const cfg={n:3,c:4,s:20,d:6};
+const H1='text-2xl font-extrabold text-[#ffd479] mb-1.5 tracking-tight',SUB='text-[13px] leading-relaxed text-[#d3be94] mb-3',H2='text-[11px] font-bold tracking-[.16em] uppercase text-[#ffd479]/85 mt-4 mb-2',
+ BTN='btn w-full mt-3.5 py-3.5 rounded-2xl font-black tracking-wider text-[#2a1a04] cursor-pointer',
+ BTN_IND='btn-ind w-full mt-3 py-3.5 rounded-2xl font-black tracking-wider cursor-pointer',
+ BTN_WLD='btn-wld w-full mt-3 py-3.5 rounded-2xl font-black tracking-wider cursor-pointer',
+ BTN_COS='btn-cos w-full mt-3 py-3.5 rounded-2xl font-black tracking-wider cursor-pointer',
+ GH='w-full mt-2 py-2.5 rounded-2xl text-[13px] font-bold bg-white/10 border border-white/15 text-amber-100 hover:bg-white/15 transition cursor-pointer',
+ OPT='opt flex-1 min-w-[62px] rounded-xl border border-white/10 bg-white/5 py-2.5 px-2 text-[13px] font-extrabold text-amber-100 cursor-pointer';
+const para=t=>`<p class="${SUB}">${t}</p>`,sm=t=>`<small class="block text-[9.5px] font-semibold opacity-65 mt-0.5">${t}</small>`;
+const row=(k,vals,lab)=>`<div class="flex gap-2 flex-wrap" data-k="${k}">${vals.map(v=>`<button class="${OPT}${cfg[k]==v?' sel':''}" data-v="${v}">${lab(v)}</button>`).join('')}</div>`;
+const open=h=>{$('#panel').html(h).scrollTop(0);$('#modal').addClass('show')},close=()=>$('#modal').removeClass('show');
+let backFn=null;
+
+function getTrophies(){
+  try{return JSON.parse(localStorage.getItem('kanche-trophies')||'{"quick":0,"district":0,"india":0,"world":0,"cosmic":0}')}catch(e){return{quick:0,district:0,india:0,world:0,cosmic:0}}
+}
+function addTrophy(k){
+  try{const tr=getTrophies();tr[k]=(tr[k]||0)+1;localStorage.setItem('kanche-trophies',JSON.stringify(tr))}catch(e){}
+}
+
+function story(){
+  S.phase='setup';backFn=story;
+  open(`<div class="flex items-center justify-between mb-2">
+    <span class="text-[10px] font-extrabold uppercase tracking-[.2em] text-amber-300/80">COSMIC EDITION · 4 TIERS</span>
+    <span class="text-[11px] font-bold text-purple-300">🪐 8 PLANETS · 25 MOONS</span>
+  </div>
+  <h1 class="${H1}">ਕੰਚੇ · Kanche Solar System Cup</h1>`+
+  para('From dusty village lanes under old tahli and neem trees near Jalandhar to the ultimate interplanetary arena — the <b>Solar System Planets & Moons Marbles Championship</b>! ☕')+
+  para('Climb the complete 4-Tier Ladder: <b>Punjab Districts (23)</b> → <b>Indian States (28)</b> → <b>World Nations (195)</b> → <b>Planets & Moons (33 Celestial Bodies)</b>!')+
+  `<button class="${BTN_COS}" data-act="cosmicCup">🪐 SOLAR SYSTEM PLANETS & MOONS CUP (33 BODIES)</button>
+   <button class="${BTN_WLD}" data-act="worldCup">🌍 WORLD MARBLES CHAMPIONSHIP (195 NATIONS)</button>
+   <button class="${BTN_IND}" data-act="natCup">🇮🇳 ALL-INDIA STATE CHAMPIONSHIP (28 STATES)</button>
+   <button class="${BTN}" data-act="setup">☕ MATCH CENTER & QUICK PLAY</button>
+   <button class="${GH}" data-act="rules">HOW TO PLAY</button>`);
+}
+
+function setup(){
+  S.phase='setup';S.mode='quick';backFn=setup;running=false;
+  setSkyTheme('Earth');
+  kids.forEach(k=>scene.remove(k.g));kids.length=0;S.marbles.forEach(kill);S.marbles=[];S.shot=S.target=null;
+  elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;
+  const tr=getTrophies();
+  open(`<div class="flex items-center justify-between mb-1">
+    <h1 class="${H1} !mb-0">FIFA-Style Match Center</h1>
+    <div class="flex gap-1 text-[10.5px] font-bold">
+      <span class="px-1.5 py-0.5 rounded-lg bg-white/5 border border-white/10" title="Punjab District Cups">🏆 ${tr.district||0}</span>
+      <span class="px-1.5 py-0.5 rounded-lg bg-amber-400/15 border border-amber-300/30 text-[#ffd479]" title="All-India Cups">🇮🇳 ${tr.india||0}</span>
+      <span class="px-1.5 py-0.5 rounded-lg bg-sky-400/15 border border-sky-300/35 text-sky-300" title="World Championships">🌍 ${tr.world||0}</span>
+      <span class="px-1.5 py-0.5 rounded-lg bg-purple-500/20 border border-purple-300/40 text-purple-200" title="Solar System Cups">🪐 ${tr.cosmic||0}</span>
+    </div>
+  </div>`+
+  para('Choose your tournament tier or play a quick village match.')+
+  `<div class="space-y-2 mb-3">
+    <button class="w-full text-left p-3.5 rounded-2xl border border-purple-400/50 bg-gradient-to-r from-purple-600/25 via-amber-500/15 to-sky-500/20 hover:border-purple-300 transition cursor-pointer" data-act="cosmicCup">
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-extrabold tracking-widest text-purple-300">🪐 TIER 4 · INTERPLANETARY FINALS (8 PLANETS + 25 MOONS)</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-black/45 text-[#ffd479]">MOONS + PLANETS</span>
+      </div>
+      <div class="text-[16px] font-black text-white mt-0.5">Solar System Planets & Moons Cup</div>
+      <div class="text-[11px] text-amber-100/80 mt-0.5">Defeat your system's Moons (Earth vs Moon, Jupiter's 4, Saturn's 9…) then battle all 8 Planets!</div>
+    </button>
+    <button class="w-full text-left p-3 rounded-2xl border border-sky-400/40 bg-gradient-to-r from-sky-500/15 to-emerald-500/15 hover:border-sky-300 transition cursor-pointer" data-act="worldCup">
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-extrabold tracking-widest text-sky-300">🌍 TIER 3 · 195 NATIONS</span>
+        <span class="text-[10px] font-bold text-[#ffd479]">WINNER ADVANCES AS EARTH</span>
+      </div>
+      <div class="text-[14px] font-black text-white mt-0.5">World Marbles Championship</div>
+      <div class="text-[11px] text-amber-100/75 mt-0.5">32-Nation FIFA World Cup (Groups A–H + Knockouts) or 195-Nation Global Gauntlet</div>
+    </button>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <button class="text-left p-3 rounded-2xl border border-amber-300/35 bg-gradient-to-br from-amber-500/15 to-orange-900/20 hover:border-[#ffd479] transition cursor-pointer" data-act="natCup">
+        <div class="text-[10px] font-extrabold tracking-widest text-[#ffd479]">🇮🇳 TIER 2 · NATIONAL</div>
+        <div class="text-[14px] font-black text-white mt-0.5">All-India State Cup</div>
+        <div class="text-[11px] text-amber-100/75 mt-0.5">28 Indian States • Winner advances as India!</div>
+      </button>
+      <button class="text-left p-3 rounded-2xl border border-white/15 bg-white/5 hover:border-amber-200/40 transition cursor-pointer" data-act="cup">
+        <div class="text-[10px] font-extrabold tracking-widest text-amber-200/80">🏆 TIER 1 · REGIONAL</div>
+        <div class="text-[14px] font-black text-white mt-0.5">Punjab District Cup</div>
+        <div class="text-[11px] text-amber-100/75 mt-0.5">23 Punjab Districts • Winner advances as Punjab!</div>
+      </button>
+    </div>
+  </div>`+
+  `<div class="border-t border-white/10 pt-3 mt-1">
+    <div class="text-[11px] font-extrabold tracking-[.16em] uppercase text-[#ffd479] mb-2">Quick Village Match</div>
+    <input id="nm" maxlength="14" placeholder="Your name" value="${cfg.name||''}" class="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-[13px] text-amber-100 outline-none">
+    <h2 class="${H2} !mt-2.5">Players</h2>`+row('n',[2,3,4],v=>v+sm(['','','DUEL','TRIO','FOUR'][v]))+
+    `<h2 class="${H2}">Marbles pooled per round</h2>`+row('c',[3,4,6],v=>v+sm('PER ROUND'))+
+    `<h2 class="${H2}">Starting pocket & Distance</h2>`+
+    `<div class="grid grid-cols-2 gap-2">
+      <div>`+row('s',[12,20,30],v=>v+sm('POCKET'))+`</div>
+      <div>`+row('d',[6,9,12,15],v=>v+'ft'+sm({6:'CLASSIC',9:'LONG',12:'HARD',15:'PRO'}[v]))+`</div>
+    </div>
+    <p id="pot" class="${SUB} mt-2.5 !mb-1"></p>
+    <button class="${BTN} !mt-2" data-act="start">START QUICK MATCH</button>
+    <button class="${GH}" data-act="rules">HOW TO PLAY</button>
+  </div>`);
+  potTxt();
+}
+const potTxt=()=>$('#pot').html(`Pot each round: <b>${cfg.n*cfg.c}</b> marbles`);
+
+function rules(){
+  open(`<h1 class="${H1}">How to play</h1>`+para('Kanche, the traditional marble game — now played on the global stage.')+
+  `<ol class="list-decimal pl-5 space-y-2 text-[13px] leading-relaxed text-[#d3be94]">
+  <li><b>The pot.</b> Every player pools marbles into the pot each round.</li>
+  <li><b>The throw.</b> The thrower rolls the whole pot toward the pit on the sloping ground. Some drop in, the rest scatter around it.</li>
+  <li><b>The target.</b> The next player picks the <b>hardest</b> scattered marble: the farthest, or the one hiding among others.</li>
+  <li><b>The flick.</b> The thrower flicks their own marble from the throw line to hit that target.</li>
+  <li><b>Hit wins.</b> A clean hit wins the <b>entire pot</b>. A miss keeps only the marbles that fell in the pit.</li>
+  <li><b>World Championship (195 Nations).</b> Choose any of the 195 countries in the world. Play the <b>FIFA-Style 32-Nation World Cup</b> (8 Groups of 4 followed by Round of 16, Quarter-Finals, Semi-Finals & Final) or the <b>195-Nation Global Gauntlet</b>!</li></ol>
+  <h2 class="${H2}">Controls</h2>`+para('Drag the round pad toward your target. The farther you pull, the harder the flick, and a dotted line previews the roll. Release to shoot. When it’s your turn to choose, tap a marble on the ground. 🔊 toggles sound.')+
+  `<button class="${BTN}" data-act="back">BACK</button>`);
+}
+
+function start(m,mode='quick'){
+  S.mode=mode;
+  if(!m)AIQ=1;
+  if(mode==='cosmic'&&m)setSkyTheme(m[1]||m[0]);
+  else setSkyTheme('Earth');
+  const n=m?2:cfg.n;
+  Object.assign(S,{c:m?3:cfg.c,D:m?[6,9,12][Math.random()*3|0]:cfg.d,round:0,thrower:0,hit:false,max:m?4:cfg.n*3});
+  S.players=Array.from({length:n},(_,i)=>({name:m?m[i]:i?PN[i]:(cfg.name||'You'),isHuman:!i,marbles:m?9:cfg.s,color:PC[i]}));
+  S.marbles.forEach(kill);S.marbles=[];
+  close();buildGround();buildVillage(S.D);fitCamera();spawnKids();hud();S.phase='ready';
+  say(m?`${m[0]} vs ${m[1]} — Kick-off!`:'Everyone chips in…');setTimeout(play,420);
+}
+
+function endGame(){
+  if(C_CUP && C_CUP.live){S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;return cosmicResult()}
+  if(W && W.live){S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;return worldResult()}
+  if(N && N.live){S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;return natResult()}
+  if(T && T.live){S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;return cupResult()}
+  S.phase='over';elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false;
+  const L=[...S.players].sort((a,b)=>b.marbles-a.marbles),w=L[0];let wins=0;
+  try{wins=+localStorage.getItem('kanche-wins')||0;if(w.isHuman){localStorage.setItem('kanche-wins',++wins);addTrophy('quick')}}catch(e){}
+  open(`<h1 class="${H1}">${w.isHuman?'You win! 🏆':w.name+' wins'}</h1>`+para('The sun slips behind the trees and mothers start calling from the lanes. Tomorrow, same time, same shade.')+
+  `<div class="flex flex-col gap-2">${L.map((p,i)=>`<div class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border ${i?'bg-white/5 border-white/10':'bg-amber-400/15 border-[#ffd479]'}"><span class="w-2.5 h-2.5 rounded-full" style="background:${hex(p.color)}"></span><b class="flex-1 !text-white">${p.name}${p.isHuman?' (you)':''}</b><b>${p.marbles}</b></div>`).join('')}</div>`+
+  (wins?para(`<span class="block mt-3">Your village wins on this device: <b>${wins}</b></span>`):'')+
+  `<button class="${BTN}" data-act="setup">PLAY AGAIN</button>`);
+}
+
+const idle=()=>{S.phase='setup';backFn=setup;running=false;S.marbles.forEach(kill);S.marbles=[];S.shot=S.target=null;kids.forEach(k=>scene.remove(k.g));kids.length=0;elJw.classList.remove('on');aimL.visible=aimRing.visible=selRing.visible=false};
+
+/* ---------- 1. Punjab District Cup (Tier 1) ---------- */
+const DIST=['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka','Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Malerkotla','Mansa','Moga','Pathankot','Patiala','Rupnagar','Mohali','Sangrur','Nawanshahr','Sri Muktsar Sahib','Tarn Taran'];
+const STG={G:'Group stage',QF:'Quarter-finals',SF:'Semi-finals',F:'Final'};
+let T=null,AIQ=1;
+const save=()=>{try{localStorage.setItem('kanche-cup',JSON.stringify(T))}catch(e){}};
+const mine=f=>f.a===T.me||f.b===T.me,fin=(f,ga,gb,pen)=>Object.assign(f,{ga,gb,pen,done:1});
+function sim(f,ko){
+  const g=t=>Math.max(0,Math.round(3+(T.str[t]-60)/10+rnd(0,5)));let ga=g(f.a),gb=g(f.b),pen=0;
+  if(ko&&ga===gb){pen=1;Math.random()<T.str[f.a]/(T.str[f.a]+T.str[f.b])?ga++:gb++}
+  fin(f,ga,gb,pen);
+}
+function stand(g){
+  const r={};T.groups[g].forEach(t=>r[t]={t,p:0,pt:0,d:0,f:0});
+  T.fx.filter(f=>f.g===g&&f.done).forEach(f=>{const a=r[f.a],b=r[f.b];a.p++;b.p++;a.f+=f.ga;b.f+=f.gb;a.d+=f.ga-f.gb;b.d+=f.gb-f.ga;
+    if(f.ga>f.gb)a.pt+=3;else if(f.ga<f.gb)b.pt+=3;else{a.pt++;b.pt++}});
+  return Object.values(r).sort((x,y)=>y.pt-x.pt||y.d-x.d||y.f-x.f||x.t.localeCompare(y.t));
+}
+function batch(){
+  const L=T.fx.filter(f=>!f.done&&!mine(f)).sort(()=>Math.random()-.5),h=T.fx.filter(f=>!f.done&&mine(f)).length,n=h?Math.ceil(L.length/(h+1)):L.length;
+  L.slice(0,n).forEach(f=>sim(f,0));if(T.fx.every(f=>f.done))toKO();
+}
+function toKO(){
+  const q=T.groups.map((_,g)=>stand(g).slice(0,2).map(r=>r.t)),[A,B,C,D]=q;
+  if(!q.flat().includes(T.me))T.exit='G';
+  T.stage='QF';T.ko=[[A[0],B[1]],[B[0],A[1]],[C[0],D[1]],[D[0],C[1]]].map(([a,b])=>({a,b,done:0}));playOut();
+}
+function playOut(){
+  for(;;){
+    T.ko.forEach(f=>{if(!f.done&&!mine(f))sim(f,1)});
+    if(T.ko.some(f=>!f.done))return;
+    const w=T.ko.map(f=>f.ga>f.gb?f.a:f.b);
+    if(T.stage==='F'){T.champ=w[0];return}
+    T.stage=T.stage==='QF'?'SF':'F';T.ko=[];for(let i=0;i<w.length;i+=2)T.ko.push({a:w[i],b:w[i+1],done:0});
+  }
+}
+function picker(){
+  idle();T=null;
+  open(`<h1 class="${H1}">Punjab District Cup</h1>`+para('23 districts drawn into 4 groups. Win the Punjab District Cup to qualify as <b>Punjab</b> for the All-India State Championship!')+
+  `<div class="grid grid-cols-2 gap-2">${DIST.map((d,i)=>`<button class="dst ${OPT.replace('opt ','')}" data-i="${i}">${d}</button>`).join('')}</div><button class="${GH}" data-act="setup">BACK</button>`);
+}
+function newCup(i){
+  const me=DIST[i],groups=[[],[],[],[]],str={};
+  [...DIST].sort(()=>Math.random()-.5).forEach((t,k)=>groups[k%4].push(t));
+  DIST.forEach(t=>str[t]=Math.round(rnd(60,95)));
+  const fx=[];groups.forEach((g,gi)=>{for(let a=0;a<g.length;a++)for(let b=a+1;b<g.length;b++)fx.push({g:gi,a:g[a],b:g[b],done:0})});
+  T={me,groups,str,fx,stage:'G',ko:[],live:0,gi:groups.findIndex(g=>g.includes(me))};save();cupHub();
+}
+function cupHub(){
+  idle();
+  if(T.champ){
+    const w=T.champ===T.me;
+    if(w && !T.rewarded){T.rewarded=1;save();addTrophy('district');fanfare()}
+    open(`<h1 class="${H1}">${w?'🏆 '+T.me+' are Punjab Champions!':T.champ+' win the cup'}</h1>`+
+    para(w?`<b>${T.me}</b> conquered Punjab! Advance to the <b>All-India State Championship</b> as Team Punjab!`:`${T.me} went out in the ${T.exit==='G'?'group stage':STG[T.exit].toLowerCase()}. Try again next season.`)+
+    (w?`<button class="${BTN_IND}" data-act="promotePunjab">🇮🇳 ADVANCE AS PUNJAB TO NATIONAL CUP</button>`:'')+
+    `<button class="${w?GH:BTN}" data-act="cupReset">NEW DISTRICT CUP</button><button class="${GH}" data-act="setup">MENU</button>`);
+    return;
+  }
+  const nx=(T.stage==='G'?T.fx:T.ko).find(f=>!f.done&&mine(f)),o=nx.a===T.me?nx.b:nx.a;
+  const body=T.stage==='G'
+    ?`<h2 class="${H2}">Group ${'ABCD'[T.gi]}</h2><table class="w-full text-[12.5px] text-[#d3be94]"><tr class="text-[10px] uppercase opacity-60"><td>District</td><td>P</td><td>MD</td><td>Pts</td></tr>${stand(T.gi).map((r,i)=>`<tr class="${r.t===T.me?'text-white font-bold':''} ${i<2?'':'opacity-70'}"><td class="py-1">${i+1}. ${r.t}</td><td>${r.p}</td><td>${r.d}</td><td><b>${r.pt}</b></td></tr>`).join('')}</table>`
+    :`<h2 class="${H2}">${STG[T.stage]}</h2>`+T.ko.map(f=>`<div class="flex justify-between gap-2 py-1 text-[13px] ${mine(f)?'text-white font-bold':'text-[#d3be94]'}"><span>${f.a}</span><span>${f.done?f.ga+' – '+f.gb+(f.pen?'*':''):'vs'}</span><span>${f.b}</span></div>`).join('');
+  open(`<h1 class="${H1}">Punjab District Cup</h1>`+para(`${STG[T.stage]} · playing for <b>${T.me}</b>`)+body+
+   para(`<span class="block mt-3">Next Fixture: <b>${T.me}</b> vs <b>${o}</b> (OVR: ${T.str[o]})</span>`)+
+   `<button class="${BTN}" data-act="cupPlay">PLAY MATCH</button><button class="${GH}" data-act="cupReset">ABANDON CUP</button><button class="${GH}" data-act="setup">MENU</button>`);
+}
+function cupPlay(){
+  const f=(T.stage==='G'?T.fx:T.ko).find(f=>!f.done&&mine(f)),o=f.a===T.me?f.b:f.a;
+  T.cur=f;T.live=1;AIQ=cl((105-T.str[o])/35,.5,1.6);start([T.me,o],'district');
+}
+function cupResult(){
+  const f=T.cur,h=S.players[0].marbles,o=S.players[1].marbles,ko=T.stage!=='G',a=f.a===T.me;let hh=h,oo=o,pen=0;
+  if(ko&&h===o){pen=1;Math.random()<.5?hh++:oo++}
+  fin(f,a?hh:oo,a?oo:hh,pen);T.live=0;
+  if(!ko)batch();else{if(hh<oo)T.exit=T.stage;playOut()}
+  save();
+  open(`<h1 class="${H1}">${hh>oo?'Victory! 🏆':hh<oo?'Defeat':'Draw'}</h1>`+para(`${T.me} <b>${hh}</b> – <b>${oo}</b> ${a?f.b:f.a}${pen?'<br>Level after four rounds — decided by golden toss.':''}`)+`<button class="${BTN}" data-act="cupHub">CONTINUE</button>`);
+}
+function cup(){if(!T)try{T=JSON.parse(localStorage.getItem('kanche-cup'))}catch(e){T=null}T?(T.live=0,cupHub()):picker()}
+function cupReset(){try{localStorage.removeItem('kanche-cup')}catch(e){}picker()}
+$('#panel').on('click','.dst',function(){newCup(+$(this).data('i'))});
+
+/* ---------- 2. All-India Inter-State Championship (Tier 2 -> Winner promotes to India in World Cup) ---------- */
+let N=null;
+const saveNat=()=>{try{localStorage.setItem('kanche-india',JSON.stringify(N))}catch(e){}};
+const natRoundLabel=rem=>rem===2?'ALL-INDIA GRAND FINAL':rem<=4?'SEMI-FINALS':rem<=8?'QUARTER-FINALS':rem<=16?'PRE-QUARTERFINALS':'NATIONAL QUALIFIER';
+
+function natPicker(defaultState='Punjab'){
+  idle();N=null;
+  const pIdx=STATES.findIndex(s=>s.name===defaultState);
+  open(`<div class="flex items-center justify-between mb-1">
+    <span class="text-[10px] font-extrabold tracking-[.2em] uppercase text-[#ffd479]">🇮🇳 TIER 2 · 28 INDIAN STATES</span>
+    <span class="text-[10px] font-bold text-emerald-300">RANDOM KNOCKOUT DRAW</span>
+  </div>
+  <h1 class="${H1}">Indian State Championship</h1>`+
+  para('Win the National Championship with <b>Punjab</b> (or any of the 28 states) to earn the honor of representing <b>Team India 🇮🇳</b> in the <b>World Marbles Championship</b>!')+
+  (pIdx>=0?`<button class="${BTN_IND} !mt-1 mb-3 flex items-center justify-center gap-2.5" data-st="${pIdx}">
+    ${crestHTML('Punjab','w-6 h-6 text-[9px]')}
+    <span>PLAY AS PUNJAB (FEATURED HOST)</span>
+  </button>`:'')+
+  `<h2 class="${H2} !mt-2">All 28 States</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+    ${STATES.map((s,i)=>`<button class="nst flex items-center gap-2 text-left rounded-xl border ${s.name==='Punjab'?'border-[#ffd479] bg-amber-400/15':'border-white/10 bg-white/5 hover:border-amber-200/40'} p-2 text-[12px] font-bold text-amber-50 transition cursor-pointer" data-st="${i}">
+      ${crestHTML(s.name,'w-6 h-6 text-[9px]')}
+      <span class="truncate">${s.name}</span>
+    </button>`).join('')}
+  </div>
+  <button class="${GH}" data-act="setup">BACK TO MENU</button>`);
+}
+
+function newNatCup(stateIndex){
+  const me=STATES[stateIndex].name,str={};
+  STATES.forEach(s=>str[s.name]=s.name==='Punjab'?88:Math.round(rnd(68,94)));
+  const pool=STATES.map(s=>s.name).sort(()=>Math.random()-.5);
+  N={me,pool,eliminated:[],history:[],str,live:0,champ:null,exitRound:null,nextOpp:null};
+  drawNextNatOpponent();saveNat();natHub();
+}
+function drawNextNatOpponent(){
+  if(!N || N.champ)return;
+  const rivals=N.pool.filter(s=>s!==N.me);
+  if(!rivals.length){N.champ=N.me;return}
+  N.nextOpp=rivals[Math.floor(Math.random()*rivals.length)];
+}
+function simOtherStateClashes(){
+  const others=N.pool.filter(s=>s!==N.me && s!==N.nextOpp).sort(()=>Math.random()-.5);
+  if(others.length<2)return[];
+  const pairsCount=Math.max(1,Math.floor(others.length/2)),roundName=natRoundLabel(N.pool.length),results=[];
+  for(let i=0;i+1<pairsCount*2;i+=2){
+    const a=others[i],b=others[i+1];
+    let ga=Math.max(1,Math.round(4+(N.str[a]-70)/9+rnd(0,5))),gb=Math.max(1,Math.round(4+(N.str[b]-70)/9+rnd(0,5))),pen=0;
+    if(ga===gb){pen=1;Math.random()<N.str[a]/(N.str[a]+N.str[b])?ga++:gb++}
+    const loser=ga>gb?b:a;
+    N.pool=N.pool.filter(s=>s!==loser);N.eliminated.push(loser);
+    const rec={round:roundName,a,b,ga,gb,pen,userMatch:false};
+    N.history.unshift(rec);results.push(rec);
+  }
+  return results;
+}
+function natHub(){
+  idle();
+  if(!N)return natPicker('Punjab');
+  if(N.champ){
+    const won=N.champ===N.me;
+    if(won && !N.rewarded){N.rewarded=1;saveNat();addTrophy('india');fanfare()}
+    open(`<div class="text-center py-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/15 border border-[#ffd479] text-[11px] font-extrabold tracking-widest text-[#ffd479] mb-3">🇮🇳 ALL-INDIA INTER-STATE CHAMPIONSHIP</div>
+      <div class="flex justify-center mb-3">${crestHTML(N.champ,'w-16 h-16 text-xl')}</div>
+      <h1 class="${H1} !text-3xl">${won?'🏆 '+N.me+' ARE NATIONAL CHAMPIONS!':N.champ+' Win the India Cup'}</h1>
+      <p class="${SUB} max-w-md mx-auto">${won
+        ?`<b>${N.me}</b> conquered all 28 Indian states! You have qualified to represent <b>INDIA 🇮🇳</b> in the <b>World Marbles Championship</b>!`
+        :`<b>${N.me}</b> were knocked out in the <b>${N.exitRound||'National Round'}</b>. <b>${N.champ}</b> lifted the national trophy.`}</p>
+    </div>
+    ${won?`<button class="${BTN_WLD}" data-act="promoteIndia">🌍 REPRESENT INDIA IN WORLD CHAMPIONSHIP</button>`:''}
+    <button class="${won?GH:BTN_IND}" data-act="natReset">NEW NATIONAL CHAMPIONSHIP</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+  if(!N.nextOpp)drawNextNatOpponent();
+  const meSt=teamObj(N.me),oppSt=teamObj(N.nextOpp),roundTitle=natRoundLabel(N.pool.length),progressPct=Math.round(((28-N.pool.length)/27)*100);
+  open(`<div class="flex items-center justify-between gap-2 mb-2">
+    <span class="px-2.5 py-1 rounded-full bg-amber-400/15 border border-[#ffd479]/50 text-[10px] font-black tracking-widest text-[#ffd479]">${roundTitle}</span>
+    <span class="text-[11px] font-bold text-amber-200/80">${N.pool.length} / 28 States Remaining</span>
+  </div>
+  <div class="w-full h-1.5 rounded-full bg-black/60 border border-white/10 overflow-hidden mb-3">
+    <div class="h-full bg-gradient-to-r from-orange-500 via-amber-300 to-emerald-500" style="width:${Math.max(4,progressPct)}%"></div>
+  </div>
+  <div class="rounded-2xl border border-amber-300/35 bg-gradient-to-b from-black/60 to-amber-950/25 p-4 mb-3">
+    <div class="text-center text-[10px] font-extrabold uppercase tracking-[.22em] text-amber-200/70 mb-3">NEXT RANDOM DRAW FIXTURE</div>
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+      <div class="flex flex-col items-center">
+        ${crestHTML(N.me,'w-12 h-12 text-sm')}
+        <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${N.me}</div>
+        <div class="text-[10px] font-bold text-amber-300 mt-0.5">OVR ${N.str[N.me]} • YOU</div>
+      </div>
+      <div class="px-2"><div class="w-9 h-9 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-xs text-[#ffd479]">VS</div></div>
+      <div class="flex flex-col items-center">
+        ${crestHTML(N.nextOpp,'w-12 h-12 text-sm')}
+        <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${N.nextOpp}</div>
+        <div class="text-[10px] font-bold text-emerald-300 mt-0.5">OVR ${N.str[N.nextOpp]} • ${oppSt.sub}</div>
+      </div>
+    </div>
+  </div>
+  <button class="${BTN_IND}" data-act="natPlay">PLAY STATE MATCH (${meSt.code3} vs ${oppSt.code3})</button>
+  <button class="${GH}" data-act="natReset">CHANGE STATE / RESTART</button>
+  <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+}
+function natPlay(){
+  if(!N || !N.nextOpp)return;
+  N.live=1;
+  const roundBoost=(28-N.pool.length)*.012;
+  AIQ=cl((106-N.str[N.nextOpp])/34 - roundBoost,.42,1.55);
+  start([N.me,N.nextOpp],'india');
+}
+function natResult(){
+  const opp=N.nextOpp;let hh=S.players[0].marbles,oo=S.players[1].marbles,pen=0;
+  if(hh===oo){pen=1;Math.random()<.52?hh++:oo++}
+  const roundName=natRoundLabel(N.pool.length);N.live=0;
+  N.history.unshift({round:roundName,a:N.me,b:opp,ga:hh,gb:oo,pen,userMatch:true});
+  if(hh>oo){
+    N.pool=N.pool.filter(s=>s!==opp);N.eliminated.push(opp);N.str[N.me]=Math.min(99,N.str[N.me]+1);
+    simOtherStateClashes();N.nextOpp=null;drawNextNatOpponent();saveNat();
+    const isChamp=N.champ===N.me;
+    open(`<h1 class="${H1}">${isChamp?'🏆 ALL-INDIA CHAMPIONS!':'State Victory! 🇮🇳'}</h1>`+
+    para(`<b>${N.me} ${hh} – ${oo} ${opp}</b>${pen?' (Golden Toss)':''}<br>${isChamp?`<b>${N.me}</b> won the National Trophy!`:`Next random opponent: <b>${N.nextOpp}</b> (${natRoundLabel(N.pool.length)}).`}`)+
+    `<button class="${BTN_IND}" data-act="natHub">${isChamp?'CLAIM TROPHY':'NEXT RANDOM STATE'}</button>`);
+  }else{
+    N.exitRound=roundName;N.pool=N.pool.filter(s=>s!==N.me);
+    while(N.pool.length>1){
+      N.pool.sort(()=>Math.random()-.5);
+      const a=N.pool[0],b=N.pool[1];let ga=Math.round(4+rnd(0,5)),gb=Math.round(4+rnd(0,5)),p2=0;
+      if(ga===gb){p2=1;Math.random()<N.str[a]/(N.str[a]+N.str[b])?ga++:gb++}
+      N.pool=N.pool.filter(s=>s!==(ga>gb?b:a));
+    }
+    N.champ=N.pool[0];saveNat();
+    open(`<h1 class="${H1}">Knocked Out</h1>`+para(`<b>${N.me} ${hh} – ${oo} ${opp}</b><br><b>${N.champ}</b> went on to win the India Cup.`)+`<button class="${BTN}" data-act="natHub">VIEW SUMMARY</button>`);
+  }
+}
+function natCup(){if(!N)try{N=JSON.parse(localStorage.getItem('kanche-india'))}catch(e){N=null}N?(N.live=0,natHub()):natPicker('Punjab')}
+function natReset(){try{localStorage.removeItem('kanche-india')}catch(e){}natPicker('Punjab')}
+function promotePunjab(){const pIdx=STATES.findIndex(s=>s.name==='Punjab');newNatCup(pIdx>=0?pIdx:19)}
+$('#panel').on('click','.nst',function(){newNatCup(+$(this).data('st'))});
+
+/* ---------- 3. WORLD MARBLES CHAMPIONSHIP (FIFA-STYLE 195 NATIONS: 32-TEAM WORLD CUP + 195-NATION GAUNTLET) ---------- */
+let W=null;
+let wFilterConf='ALL',wSearchQuery='',wFormat='fifa'; // 'fifa' = 32-Nation World Cup (Groups + KO), 'gauntlet' = 195-Nation Elimination
+const saveWorld=()=>{try{localStorage.setItem('kanche-world',JSON.stringify(W))}catch(e){}};
+const W_STG={G:'Group Stage',R16:'Round of 16',QF:'Quarter-Finals',SF:'Semi-Finals',F:'World Cup Final'};
+
+function worldPicker(defaultCountry='India'){
+  idle();W=null;wSearchQuery='';wFilterConf='ALL';
+  const indIdx=COUNTRIES.findIndex(c=>c.name===defaultCountry);
+  open(`<div class="flex items-center justify-between mb-1">
+    <span class="text-[10px] font-extrabold tracking-[.2em] uppercase text-sky-300">🌍 FIFA-STYLE WORLD FINALS</span>
+    <span class="text-[10px] font-bold text-[#ffd479]">ALL 195 NATIONS</span>
+  </div>
+  <h1 class="${H1}">World Marbles Championship</h1>`+
+  para('Select your nation from all 195 countries and choose your FIFA tournament format:')+
+
+  `<div class="grid grid-cols-2 gap-2 mb-3" id="wFmtRow">
+    <button type="button" class="wfmt text-left p-2.5 rounded-xl border ${wFormat==='fifa'?'border-[#ffd479] bg-amber-400/20 text-white':'border-white/10 bg-white/5 text-amber-100/75'} cursor-pointer" data-fmt="fifa">
+      <div class="text-[10px] font-black tracking-wider text-[#ffd479]">🏆 FIFA WORLD CUP</div>
+      <div class="text-[12px] font-extrabold mt-0.5">32-Nation Finals</div>
+      <div class="text-[10px] opacity-75">8 Groups (A–H) + R16 to Final</div>
+    </button>
+    <button type="button" class="wfmt text-left p-2.5 rounded-xl border ${wFormat==='gauntlet'?'border-sky-300 bg-sky-400/20 text-white':'border-white/10 bg-white/5 text-amber-100/75'} cursor-pointer" data-fmt="gauntlet">
+      <div class="text-[10px] font-black tracking-wider text-sky-300">🌐 GLOBAL GAUNTLET</div>
+      <div class="text-[12px] font-extrabold mt-0.5">All 195 Nations</div>
+      <div class="text-[10px] opacity-75">Winner vs Random Nation</div>
+    </button>
+  </div>`+
+
+  (indIdx>=0?`<button class="${BTN_WLD} !mt-0 mb-3 flex items-center justify-center gap-2.5" data-ci="${indIdx}">
+    ${crestHTML('India','w-6 h-6 text-[9px]')}
+    <span>PLAY AS INDIA 🇮🇳 (FEATURED NATION)</span>
+  </button>`:'')+
+
+  `<div class="flex flex-col sm:flex-row gap-2 mb-2">
+    <input id="wSearch" placeholder="Search 195 countries (e.g., India, Brazil, Canada, Japan)..." class="flex-1 rounded-xl bg-white/5 border border-white/15 px-3 py-2 text-[12.5px] text-amber-100 outline-none focus:border-[#ffd479]">
+  </div>
+  <div class="flex gap-1.5 flex-wrap mb-2.5" id="wConfTabs">
+    ${['ALL','AFC','UEFA','CONMEBOL','CONCACAF','CAF','OFC'].map(cf=>`<button type="button" class="wconf px-2.5 py-1 rounded-lg text-[10px] font-extrabold tracking-wider border ${cf==='ALL'?'border-[#ffd479] bg-amber-400/20 text-[#ffd479]':'border-white/10 bg-white/5 text-amber-100/70'} cursor-pointer" data-cf="${cf}">${cf}</button>`).join('')}
+  </div>
+  <div id="wCountryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[250px] overflow-y-auto pr-1"></div>
+  <button class="${GH} mt-3" data-act="setup">BACK TO MATCH CENTER</button>`);
+  renderWorldCountryGrid();
+}
+
+function renderWorldCountryGrid(){
+  const q=wSearchQuery.trim().toLowerCase();
+  const list=COUNTRIES.map((c,i)=>({...c,idx:i})).filter(c=>{
+    if(wFilterConf!=='ALL' && c.conf!==wFilterConf)return false;
+    if(q && !c.name.toLowerCase().includes(q) && !c.code3.toLowerCase().includes(q))return false;
+    return true;
+  });
+  if(!list.length){
+    $('#wCountryGrid').html(`<div class="col-span-full text-center py-6 text-[12px] text-amber-200/60">No country matches "${wSearchQuery}".</div>`);
+    return;
+  }
+  $('#wCountryGrid').html(list.map(c=>`
+    <button type="button" class="wct flex items-center gap-2 text-left rounded-xl border ${c.name==='India'?'border-[#ffd479] bg-amber-400/15':'border-white/10 bg-white/5 hover:border-sky-300/50'} p-2 text-[11.5px] font-bold text-amber-50 transition cursor-pointer" data-ci="${c.idx}">
+      ${crestHTML(c.name,'w-6 h-6 text-[9px]')}
+      <div class="min-w-0 flex-1">
+        <div class="truncate">${c.name}</div>
+        <div class="text-[9px] text-amber-200/60 font-semibold">${c.conf} · ${c.ovr}</div>
+      </div>
+    </button>
+  `).join(''));
+}
+
+/* Initialize FIFA 32-Nation World Cup OR 195-Nation Global Gauntlet */
+function newWorldCup(countryIdx){
+  const me=COUNTRIES[countryIdx].name;
+  const str={};
+  COUNTRIES.forEach(c=>str[c.name]=c.ovr + Math.round(rnd(-2,3)));
+  str[me]=Math.max(str[me],88);
+
+  if(wFormat==='gauntlet'){
+    const pool=COUNTRIES.map(c=>c.name).sort(()=>Math.random()-.5);
+    W={format:'gauntlet',me,pool,history:[],str,live:0,champ:null,exitStage:null,nextOpp:null};
+    drawNextGauntletRival();
+    saveWorld();
+    worldHub();
+    return;
+  }
+
+  // FIFA 32-Nation World Cup Finals Draw (User's country + top 31 seeded/qualified nations across all confederations)
+  const others=COUNTRIES.filter(c=>c.name!==me)
+    .sort((a,b)=>(b.ovr+rnd(-8,8))-(a.ovr+rnd(-8,8)))
+    .slice(0,31)
+    .map(c=>c.name);
+  const qualified=[me,...others].sort((a,b)=>str[b]-str[a]);
+
+  // Seed into 4 Pots of 8 teams (just like FIFA World Cup Draw!)
+  const pots=[qualified.slice(0,8),qualified.slice(8,16),qualified.slice(16,24),qualified.slice(24,32)];
+  const groups=[[],[],[],[],[],[],[],[]];
+  pots.forEach(pot=>{
+    const shuffled=[...pot].sort(()=>Math.random()-.5);
+    shuffled.forEach((team,gi)=>groups[gi].push(team));
+  });
+
+  // Generate 6 Round-Robin Group Fixtures per Group (48 total group matches)
+  const fx=[];
+  groups.forEach((g,gi)=>{
+    for(let a=0;a<4;a++)for(let b=a+1;b<4;b++)fx.push({g:gi,a:g[a],b:g[b],done:0});
+  });
+
+  W={
+    format:'fifa',
+    me,
+    groups,
+    str,
+    fx,
+    stage:'G',
+    ko:[],
+    live:0,
+    champ:null,
+    exitStage:null,
+    gi:groups.findIndex(g=>g.includes(me))
+  };
+  saveWorld();
+  worldHub();
+}
+
+/* FIFA World Cup Helpers */
+const wMine=f=>f.a===W.me||f.b===W.me;
+const wFin=(f,ga,gb,pen)=>Object.assign(f,{ga,gb,pen,done:1});
+function wSim(f,ko){
+  const g=t=>Math.max(0,Math.round(3+(W.str[t]-65)/9+rnd(0,5)));
+  let ga=g(f.a),gb=g(f.b),pen=0;
+  if(ko&&ga===gb){pen=1;Math.random()<W.str[f.a]/(W.str[f.a]+W.str[f.b])?ga++:gb++}
+  wFin(f,ga,gb,pen);
+}
+function wStand(gi){
+  const r={};
+  W.groups[gi].forEach(t=>r[t]={t,p:0,w:0,d:0,l:0,f:0,a:0,gd:0,pt:0});
+  W.fx.filter(f=>f.g===gi&&f.done).forEach(f=>{
+    const A=r[f.a],B=r[f.b];
+    A.p++;B.p++;A.f+=f.ga;A.a+=f.gb;B.f+=f.gb;B.a+=f.ga;
+    A.gd=A.f-A.a;B.gd=B.f-B.a;
+    if(f.ga>f.gb){A.w++;B.l++;A.pt+=3}
+    else if(f.ga<f.gb){B.w++;A.l++;B.pt+=3}
+    else{A.d++;B.d++;A.pt++;B.pt++}
+  });
+  return Object.values(r).sort((x,y)=>y.pt-x.pt||y.gd-x.gd||y.f-x.f||W.str[y.t]-W.str[x.t]);
+}
+function wBatch(){
+  const L=W.fx.filter(f=>!f.done&&!wMine(f)).sort(()=>Math.random()-.5);
+  const remMine=W.fx.filter(f=>!f.done&&wMine(f)).length;
+  const n=remMine?Math.ceil(L.length/(remMine+1)):L.length;
+  L.slice(0,n).forEach(f=>wSim(f,0));
+  if(W.fx.every(f=>f.done))wToKO();
+}
+function wToKO(){
+  const q=W.groups.map((_,gi)=>wStand(gi).slice(0,2).map(r=>r.t));
+  if(!q.flat().includes(W.me))W.exitStage='G';
+  W.stage='R16';
+  // Authentic FIFA World Cup Bracket Pairing: A1vB2, C1vD2, E1vF2, G1vH2, B1vA2, D1vC2, F1vE2, H1vG2
+  W.ko=[
+    [q[0][0],q[1][1]],[q[2][0],q[3][1]],[q[4][0],q[5][1]],[q[6][0],q[7][1]],
+    [q[1][0],q[0][1]],[q[3][0],q[2][1]],[q[5][0],q[4][1]],[q[7][0],q[6][1]]
+  ].map(([a,b])=>({a,b,done:0}));
+  wPlayOut();
+}
+function wPlayOut(){
+  for(;;){
+    W.ko.forEach(f=>{if(!f.done&&!wMine(f))wSim(f,1)});
+    if(W.ko.some(f=>!f.done))return;
+    const winners=W.ko.map(f=>f.ga>f.gb?f.a:f.b);
+    if(W.stage==='F'){W.champ=winners[0];return}
+    W.stage=W.stage==='R16'?'QF':W.stage==='QF'?'SF':'F';
+    W.ko=[];
+    for(let i=0;i<winners.length;i+=2)W.ko.push({a:winners[i],b:winners[i+1],done:0});
+  }
+}
+
+/* Global 195-Nation Gauntlet Helpers */
+function drawNextGauntletRival(){
+  if(!W || W.champ)return;
+  const rivals=W.pool.filter(c=>c!==W.me);
+  if(!rivals.length){W.champ=W.me;return}
+  W.nextOpp=rivals[Math.floor(Math.random()*rivals.length)];
+}
+function simOtherGauntletClashes(){
+  const others=W.pool.filter(c=>c!==W.me && c!==W.nextOpp).sort(()=>Math.random()-.5);
+  if(others.length<2)return;
+  const pairs=Math.max(1,Math.floor(others.length/2));
+  for(let i=0;i+1<pairs*2;i+=2){
+    const a=others[i],b=others[i+1];
+    let ga=Math.round(4+(W.str[a]-68)/9+rnd(0,5)),gb=Math.round(4+(W.str[b]-68)/9+rnd(0,5));
+    if(ga===gb)Math.random()<W.str[a]/(W.str[a]+W.str[b])?ga++:gb++;
+    const loser=ga>gb?b:a;
+    W.pool=W.pool.filter(c=>c!==loser);
+    W.history.unshift({a,b,ga,gb,user:false});
+  }
+}
+
+function worldHub(){
+  idle();
+  if(!W)return worldPicker('India');
+
+  // Champion / Elimination Finale Screen
+  if(W.champ){
+    const won=W.champ===W.me;
+    if(won && !W.rewarded){W.rewarded=1;saveWorld();addTrophy('world');fanfare()}
+    const chObj=teamObj(W.champ);
+    open(`<div class="text-center py-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/15 border border-sky-300/40 text-[10.5px] font-black tracking-widest text-sky-300 mb-3">
+        🌍 WORLD MARBLES CHAMPIONSHIP
+      </div>
+      <div class="flex justify-center mb-3">${crestHTML(W.champ,'w-16 h-16 text-xl')}</div>
+      <h1 class="${H1} !text-3xl">${won?'🏆 '+W.me.toUpperCase()+' ARE WORLD CHAMPIONS!':W.champ+' Win the World Cup'}</h1>
+      <p class="${SUB} max-w-md mx-auto">${won
+        ?`Unbelievable scenes! <b>${W.me}</b> (${chObj.sub}) have conquered Earth! Now represent <b>Planet Earth 🌍</b> against the <b>Moon</b> and all <b>8 Solar System Planets</b>!`
+        :`<b>${W.me}</b> bowed out in the <b>${W.exitStage==='G'?'Group Stage':(W_STG[W.exitStage]||W.exitStage)}</b>. <b>${W.champ}</b> defeated all challengers to be crowned World Champions.`}</p>
+    </div>
+    ${W.format==='fifa' && W.ko && W.ko.length?`
+      <h2 class="${H2}">World Cup Final Result</h2>
+      <div class="p-3 rounded-xl border border-amber-300/35 bg-amber-400/10 flex items-center justify-between text-[13px] font-bold">
+        <span>${W.ko[0].a}</span>
+        <span class="px-2.5 py-0.5 rounded bg-black/60 text-[#ffd479]">${W.ko[0].ga} – ${W.ko[0].gb}${W.ko[0].pen?'*':''}</span>
+        <span>${W.ko[0].b}</span>
+      </div>`:''}
+    ${won?`<button class="${BTN_COS}" data-act="promoteEarth">🪐 ADVANCE AS PLANET EARTH TO SOLAR SYSTEM CUP</button>`:''}
+    <button class="${won?GH:BTN_WLD}" data-act="worldReset">NEW WORLD CHAMPIONSHIP</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+
+  // Gauntlet Mode Hub
+  if(W.format==='gauntlet'){
+    if(!W.nextOpp)drawNextGauntletRival();
+    const meT=teamObj(W.me),oppT=teamObj(W.nextOpp);
+    const pct=Math.round(((195-W.pool.length)/194)*100);
+    open(`<div class="flex items-center justify-between gap-2 mb-2">
+      <span class="px-2.5 py-1 rounded-full bg-sky-400/15 border border-sky-300/40 text-[10px] font-black tracking-widest text-sky-300">🌐 195-NATION GLOBAL GAUNTLET</span>
+      <span class="text-[11px] font-bold text-amber-200/80">${W.pool.length} / 195 Nations Left</span>
+    </div>
+    <div class="w-full h-1.5 rounded-full bg-black/60 border border-white/10 overflow-hidden mb-3">
+      <div class="h-full bg-gradient-to-r from-sky-400 via-amber-300 to-emerald-400" style="width:${Math.max(3,pct)}%"></div>
+    </div>
+    <div class="rounded-2xl border border-sky-300/35 bg-gradient-to-b from-black/60 to-sky-950/25 p-4 mb-3">
+      <div class="text-center text-[10px] font-extrabold uppercase tracking-[.22em] text-sky-300/80 mb-3">WORLD STAGE RANDOM DRAW</div>
+      <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+        <div class="flex flex-col items-center">
+          ${crestHTML(W.me,'w-12 h-12 text-sm')}
+          <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${W.me}</div>
+          <div class="text-[10px] font-bold text-amber-300 mt-0.5">${meT.sub} · OVR ${W.str[W.me]}</div>
+        </div>
+        <div class="px-2"><div class="w-9 h-9 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-xs text-[#ffd479]">VS</div></div>
+        <div class="flex flex-col items-center">
+          ${crestHTML(W.nextOpp,'w-12 h-12 text-sm')}
+          <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${W.nextOpp}</div>
+          <div class="text-[10px] font-bold text-sky-300 mt-0.5">${oppT.sub} · OVR ${W.str[W.nextOpp]}</div>
+        </div>
+      </div>
+    </div>
+    ${W.history.length?`<h2 class="${H2} !mt-1">Latest Global Results</h2>
+      <div class="space-y-1 max-h-28 overflow-y-auto pr-1 mb-2">
+        ${W.history.slice(0,5).map(m=>`<div class="flex justify-between px-2.5 py-1 rounded text-[11.5px] ${m.user?'bg-amber-400/15 text-white font-bold':'bg-white/5 text-[#d3be94]'}"><span>${m.a}</span><b>${m.ga} – ${m.gb}</b><span>${m.b}</span></div>`).join('')}
+      </div>`:''}
+    <button class="${BTN_WLD}" data-act="worldPlay">PLAY WORLD MATCH (${meT.code3} vs ${oppT.code3})</button>
+    <button class="${GH}" data-act="worldReset">CHANGE NATION / FORMAT</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+
+  // FIFA 32-Nation World Cup Hub (Group Table or Knockout Bracket + Pre-Match Card)
+  const nx=(W.stage==='G'?W.fx:W.ko).find(f=>!f.done&&wMine(f));
+  const opp=nx.a===W.me?nx.b:nx.a;
+  const meT=teamObj(W.me),oppT=teamObj(opp);
+
+  const stageBody=W.stage==='G'
+    ?`<div class="flex items-center justify-between mt-2 mb-1.5">
+        <span class="text-[11px] font-black tracking-widest uppercase text-[#ffd479]">GROUP ${'ABCDEFGH'[W.gi]} STANDINGS</span>
+        <span class="text-[10px] text-emerald-300 font-bold">Top 2 Advance to R16</span>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-black/40 overflow-hidden mb-3">
+        <table class="w-full text-[12px] text-[#d3be94]">
+          <thead class="bg-white/5 text-[9.5px] uppercase text-amber-200/70">
+            <tr><th class="text-left py-1.5 px-2.5">Nation</th><th class="py-1.5 px-1.5">MP</th><th class="py-1.5 px-1.5">W-D-L</th><th class="py-1.5 px-1.5">MD</th><th class="py-1.5 px-2.5 text-right">PTS</th></tr>
+          </thead>
+          <tbody>
+            ${wStand(W.gi).map((r,i)=>`<tr class="border-t border-white/5 ${r.t===W.me?'bg-amber-400/15 text-white font-extrabold':''} ${i<2?'border-l-2 border-l-emerald-400':'opacity-75'}">
+              <td class="py-1.5 px-2.5 flex items-center gap-1.5">${crestHTML(r.t,'w-5 h-5 text-[8px]')}<span class="truncate max-w-[130px]">${r.t}</span></td>
+              <td class="text-center py-1.5">${r.p}</td>
+              <td class="text-center py-1.5 text-[11px]">${r.w}-${r.d}-${r.l}</td>
+              <td class="text-center py-1.5">${r.gd>0?'+'+r.gd:r.gd}</td>
+              <td class="text-right py-1.5 px-2.5 font-black text-[#ffd479]">${r.pt}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`
+    :`<h2 class="${H2} !mt-2">${W_STG[W.stage]} Fixtures</h2>
+      <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1 mb-3">
+        ${W.ko.map(f=>`<div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl border ${wMine(f)?'border-[#ffd479]/50 bg-amber-400/15 text-white font-bold':'border-white/10 bg-white/5 text-[#d3be94]'} text-[12px]">
+          <span class="flex items-center gap-1.5 truncate flex-1">${crestHTML(f.a,'w-5 h-5 text-[8px]')}<span class="truncate">${f.a}</span></span>
+          <span class="px-2 py-0.5 rounded bg-black/55 text-[#ffd479] font-black">${f.done?f.ga+' – '+f.gb+(f.pen?'*':''):'VS'}</span>
+          <span class="flex items-center justify-end gap-1.5 truncate flex-1"><span class="truncate">${f.b}</span>${crestHTML(f.b,'w-5 h-5 text-[8px]')}</span>
+        </div>`).join('')}
+      </div>`;
+
+  open(`<div class="flex items-center justify-between mb-2">
+    <span class="px-2.5 py-0.5 rounded-full bg-sky-400/15 border border-sky-300/40 text-[10px] font-black tracking-widest text-sky-300">🌍 FIFA WORLD CUP · ${W_STG[W.stage].toUpperCase()}</span>
+    <span class="text-[11px] font-bold text-[#ffd479]">${meT.code3}</span>
+  </div>
+  ${stageBody}
+  <!-- Pre-Match FIFA Broadcast Card -->
+  <div class="rounded-2xl border border-amber-300/35 bg-gradient-to-b from-black/65 to-amber-950/25 p-3.5 mb-2">
+    <div class="text-center text-[9.5px] font-extrabold uppercase tracking-[.22em] text-amber-200/70 mb-2.5">NEXT WORLD CUP FIXTURE</div>
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+      <div class="flex flex-col items-center">
+        ${crestHTML(W.me,'w-11 h-11 text-xs')}
+        <div class="font-black text-[13.5px] text-white mt-1 leading-tight">${W.me}</div>
+        <div class="text-[10px] font-bold text-amber-300">${meT.sub} · ${W.str[W.me]}</div>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-[11px] text-[#ffd479]">VS</div>
+      <div class="flex flex-col items-center">
+        ${crestHTML(opp,'w-11 h-11 text-xs')}
+        <div class="font-black text-[13.5px] text-white mt-1 leading-tight">${opp}</div>
+        <div class="text-[10px] font-bold text-sky-300">${oppT.sub} · ${W.str[opp]}</div>
+      </div>
+    </div>
+  </div>
+  <button class="${BTN_WLD}" data-act="worldPlay">KICK OFF (${meT.code3} vs ${oppT.code3})</button>
+  <button class="${GH}" data-act="worldReset">CHANGE NATION / NEW WORLD CUP</button>
+  <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+}
+
+function worldPlay(){
+  if(!W)return;
+  if(W.format==='gauntlet'){
+    const opp=W.nextOpp;
+    W.live=1;
+    AIQ=cl((106-W.str[opp])/34,.42,1.55);
+    start([W.me,opp],'world');
+    return;
+  }
+  const f=(W.stage==='G'?W.fx:W.ko).find(f=>!f.done&&wMine(f));
+  const opp=f.a===W.me?f.b:f.a;
+  W.cur=f;W.live=1;
+  AIQ=cl((106-W.str[opp])/34,.42,1.55);
+  start([W.me,opp],'world');
+}
+
+function worldResult(){
+  W.live=0;
+  if(W.format==='gauntlet'){
+    const opp=W.nextOpp;
+    let hh=S.players[0].marbles,oo=S.players[1].marbles,pen=0;
+    if(hh===oo){pen=1;Math.random()<.52?hh++:oo++}
+    W.history.unshift({a:W.me,b:opp,ga:hh,gb:oo,user:true});
+    if(hh>oo){
+      W.pool=W.pool.filter(c=>c!==opp);
+      W.str[W.me]=Math.min(99,W.str[W.me]+1);
+      simOtherGauntletClashes();
+      W.nextOpp=null;drawNextGauntletRival();saveWorld();
+      const isChamp=W.champ===W.me;
+      open(`<h1 class="${H1}">${isChamp?'🏆 WORLD CHAMPIONS!':'World Victory! 🌍'}</h1>`+
+      para(`<b>${W.me} ${hh} – ${oo} ${opp}</b>${pen?' (Golden Toss)':''}<br>${isChamp?`<b>${W.me}</b> conquered all 195 nations!`:`Next random challenger: <b>${W.nextOpp}</b> (${W.pool.length} nations left).`}`)+
+      `<button class="${BTN_WLD}" data-act="worldHub">${isChamp?'CLAIM WORLD TROPHY':'NEXT RANDOM NATION'}</button>`);
+    }else{
+      W.exitStage='Global Gauntlet';
+      while(W.pool.length>1){
+        W.pool.sort(()=>Math.random()-.5);
+        const a=W.pool[0],b=W.pool[1];
+        W.pool=W.pool.filter(c=>c!==(W.str[a]+rnd(0,12)>W.str[b]+rnd(0,12)?b:a));
+      }
+      W.champ=W.pool[0];saveWorld();
+      open(`<h1 class="${H1}">Eliminated</h1>`+para(`<b>${W.me} ${hh} – ${oo} ${opp}</b><br><b>${W.champ}</b> won the World Marbles Championship.`)+`<button class="${BTN}" data-act="worldHub">VIEW SUMMARY</button>`);
+    }
+    return;
+  }
+
+  // FIFA 32-Nation World Cup Match Resolution
+  const f=W.cur,h=S.players[0].marbles,o=S.players[1].marbles,ko=W.stage!=='G',isA=f.a===W.me;
+  let hh=h,oo=o,pen=0;
+  if(ko&&h===o){pen=1;Math.random()<.52?hh++:oo++}
+  wFin(f,isA?hh:oo,isA?oo:hh,pen);
+  if(!ko)wBatch();
+  else{
+    if(hh<oo)W.exitStage=W.stage;
+    wPlayOut();
+  }
+  saveWorld();
+  const oppName=isA?f.b:f.a;
+  open(`<h1 class="${H1}">${hh>oo?'World Cup Win! 🌍':hh<oo?'Defeat':'Draw'}</h1>`+
+  para(`${W.me} <b>${hh}</b> – <b>${oo}</b> ${oppName}${pen?'<br>Level after four rounds — decided by golden toss.':''}`)+
+  `<button class="${BTN_WLD}" data-act="worldHub">CONTINUE WORLD CUP</button>`);
+}
+
+function worldCup(){if(!W)try{W=JSON.parse(localStorage.getItem('kanche-world'))}catch(e){W=null}W?(W.live=0,worldHub()):worldPicker('India')}
+function worldReset(){try{localStorage.removeItem('kanche-world')}catch(e){}worldPicker('India')}
+function promoteIndia(){wFormat='fifa';const indIdx=COUNTRIES.findIndex(c=>c.name==='India');newWorldCup(indIdx>=0?indIdx:77)}
+
+/* ---------- 4. SOLAR SYSTEM PLANETS & MOONS CHAMPIONSHIP (Tier 4 Cosmic Finals) ---------- */
+let C_CUP=null;
+let cFormat='system',cFilter='ALL'; // 'system' = Moon Qualifiers + 8-Planet Interplanetary Cup; 'gauntlet' = 33-Body Cosmic Gauntlet
+const saveCosmic=()=>{try{localStorage.setItem('kanche-cosmic',JSON.stringify(C_CUP))}catch(e){}};
+const C_STG={M:'Moon System Qualifier',G:'Interplanetary Group Stage',SF:'Cosmic Semi-Finals',F:'Solar System Grand Final'};
+
+function cosmicPicker(defaultBody='Earth'){
+  idle();C_CUP=null;cFilter='ALL';
+  const earIdx=COSMIC_BODIES.findIndex(b=>b.name===defaultBody);
+  open(`<div class="flex items-center justify-between mb-1">
+    <span class="text-[10px] font-extrabold tracking-[.2em] uppercase text-purple-300">🪐 TIER 4 · SOLAR SYSTEM FINALS</span>
+    <span class="text-[10px] font-bold text-[#ffd479]">8 PLANETS + 25 MOONS</span>
+  </div>
+  <h1 class="${H1}">Planets & Moons Championship</h1>`+
+  para('Select any of the <b>8 Planets</b> or <b>25 Moons</b> from the Solar System hierarchy and pick your cosmic tournament format:')+
+
+  `<div class="grid grid-cols-2 gap-2 mb-3">
+    <button type="button" class="cfmt text-left p-2.5 rounded-xl border ${cFormat==='system'?'border-purple-300 bg-purple-500/20 text-white':'border-white/10 bg-white/5 text-amber-100/75'} cursor-pointer" data-cfmt="system">
+      <div class="text-[10px] font-black tracking-wider text-purple-300">🪐 SYSTEM + PLANETS</div>
+      <div class="text-[12px] font-extrabold mt-0.5">Moon Qualifiers + 8-Planet Cup</div>
+      <div class="text-[10px] opacity-75">Beat your system's Moons, then face all 8 Planets</div>
+    </button>
+    <button type="button" class="cfmt text-left p-2.5 rounded-xl border ${cFormat==='gauntlet'?'border-sky-300 bg-sky-400/20 text-white':'border-white/10 bg-white/5 text-amber-100/75'} cursor-pointer" data-cfmt="gauntlet">
+      <div class="text-[10px] font-black tracking-wider text-sky-300">☄️ 33-BODY GAUNTLET</div>
+      <div class="text-[12px] font-extrabold mt-0.5">All Planets & Moons</div>
+      <div class="text-[10px] opacity-75">Winner vs Random Celestial Body</div>
+    </button>
+  </div>`+
+
+  (earIdx>=0?`<button class="${BTN_COS} !mt-0 mb-3 flex items-center justify-center gap-2.5" data-cbi="${earIdx}">
+    ${crestHTML('Earth','w-6 h-6 text-[9px]')}
+    <span>PLAY AS PLANET EARTH 🌍 (VS MOON → 8 PLANETS)</span>
+  </button>`:'')+
+
+  `<div class="flex gap-1.5 flex-wrap mb-2.5">
+    ${['ALL','Planets','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'].map(fl=>`<button type="button" class="cflt px-2.5 py-1 rounded-lg text-[10px] font-extrabold tracking-wider border ${fl==='ALL'?'border-purple-300 bg-purple-500/25 text-purple-200':'border-white/10 bg-white/5 text-amber-100/70'} cursor-pointer" data-cfl="${fl}">${fl}</button>`).join('')}
+  </div>
+  <div id="cBodyGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[250px] overflow-y-auto pr-1"></div>
+  <button class="${GH} mt-3" data-act="setup">BACK TO MATCH CENTER</button>`);
+  renderCosmicGrid();
+}
+
+function renderCosmicGrid(){
+  const list=COSMIC_BODIES.map((b,i)=>({...b,idx:i})).filter(b=>{
+    if(cFilter==='ALL')return true;
+    if(cFilter==='Planets')return b.type==='Planet';
+    return b.planet===cFilter;
+  });
+  $('#cBodyGrid').html(list.map(b=>`
+    <button type="button" class="cbody flex items-center gap-2 text-left rounded-xl border ${b.type==='Planet'?'border-amber-300/35 bg-amber-400/10':'border-white/10 bg-white/5'} hover:border-purple-300 p-2 text-[11.5px] font-bold text-amber-50 transition cursor-pointer" data-cbi="${b.idx}">
+      ${crestHTML(b.name,'w-6 h-6 text-[9px]')}
+      <div class="min-w-0 flex-1">
+        <div class="truncate">${b.name}</div>
+        <div class="text-[9px] text-amber-200/65 font-semibold truncate">${b.sub} · ${b.ovr}</div>
+      </div>
+    </button>
+  `).join(''));
+}
+
+function newCosmicCup(bodyIdx){
+  const chosen=COSMIC_BODIES[bodyIdx];
+  const me=chosen.name;
+  const homePlanet=chosen.planet;
+  const str={};
+  COSMIC_BODIES.forEach(b=>str[b.name]=b.ovr + Math.round(rnd(-2,2)));
+  str[me]=Math.max(str[me],90);
+
+  if(cFormat==='gauntlet'){
+    const pool=COSMIC_BODIES.map(b=>b.name).sort(()=>Math.random()-.5);
+    C_CUP={format:'gauntlet',me,homePlanet,pool,history:[],str,live:0,champ:null,exitStage:null,nextOpp:null};
+    drawCosmicGauntletRival();
+    saveCosmic();
+    cosmicHub();
+    return;
+  }
+
+  // Stage 1: Planetary System Moon Qualifiers (if homePlanet has moons!)
+  const sysMoons=SOLAR_SYSTEM_DATA[homePlanet]||[];
+  const sysContenders=[homePlanet,...sysMoons];
+  const moonRivals=sysContenders.filter(x=>x!==me).sort(()=>Math.random()-.5);
+
+  C_CUP={
+    format:'system',
+    me,
+    homePlanet,
+    sysContenders,
+    moonRivals,
+    moonHistory:[],
+    str,
+    stage:moonRivals.length?'M':'G',
+    groups:[[],[]],
+    fx:[],
+    ko:[],
+    gi:0,
+    live:0,
+    champ:null,
+    exitStage:null
+  };
+
+  if(!moonRivals.length){
+    initInterplanetaryStage();
+  }
+  saveCosmic();
+  cosmicHub();
+}
+
+function initInterplanetaryStage(){
+  // Simulate other planetary systems to crown the 8 Planetary Representatives
+  const reps=PLANET_NAMES.map(pl=>{
+    if(pl===C_CUP.homePlanet)return C_CUP.me;
+    const moons=SOLAR_SYSTEM_DATA[pl]||[];
+    if(!moons.length)return pl;
+    // Slight edge to the host planet, though top moons like Titan/Ganymede/Triton can upset!
+    const candidates=[pl,...moons];
+    return candidates.sort((a,b)=>(C_CUP.str[b]+rnd(0,10))-(C_CUP.str[a]+rnd(0,10)))[0];
+  });
+
+  // Group A: Inner Solar System (Mercury, Venus, Earth, Mars systems), Group B: Outer Gas & Ice Giants (Jupiter, Saturn, Uranus, Neptune systems)
+  const gA=reps.slice(0,4);
+  const gB=reps.slice(4,8);
+  C_CUP.groups=[gA,gB];
+  C_CUP.gi=gA.includes(C_CUP.me)?0:1;
+  C_CUP.stage='G';
+  C_CUP.fx=[];
+  C_CUP.groups.forEach((g,gi)=>{
+    for(let a=0;a<4;a++)for(let b=a+1;b<4;b++)C_CUP.fx.push({g:gi,a:g[a],b:g[b],done:0});
+  });
+}
+
+const cMine=f=>f.a===C_CUP.me||f.b===C_CUP.me;
+const cFin=(f,ga,gb,pen)=>Object.assign(f,{ga,gb,pen,done:1});
+function cSim(f,ko){
+  const g=t=>Math.max(0,Math.round(3+(C_CUP.str[t]-72)/8+rnd(0,5)));
+  let ga=g(f.a),gb=g(f.b),pen=0;
+  if(ko&&ga===gb){pen=1;Math.random()<C_CUP.str[f.a]/(C_CUP.str[f.a]+C_CUP.str[f.b])?ga++:gb++}
+  cFin(f,ga,gb,pen);
+}
+function cStand(gi){
+  const r={};
+  C_CUP.groups[gi].forEach(t=>r[t]={t,p:0,w:0,d:0,l:0,f:0,a:0,gd:0,pt:0});
+  C_CUP.fx.filter(f=>f.g===gi&&f.done).forEach(f=>{
+    const A=r[f.a],B=r[f.b];
+    A.p++;B.p++;A.f+=f.ga;A.a+=f.gb;B.f+=f.gb;B.a+=f.ga;
+    A.gd=A.f-A.a;B.gd=B.f-B.a;
+    if(f.ga>f.gb){A.w++;B.l++;A.pt+=3}
+    else if(f.ga<f.gb){B.w++;A.l++;B.pt+=3}
+    else{A.d++;B.d++;A.pt++;B.pt++}
+  });
+  return Object.values(r).sort((x,y)=>y.pt-x.pt||y.gd-y.gd||y.f-y.f||C_CUP.str[y.t]-C_CUP.str[x.t]);
+}
+function cBatch(){
+  const L=C_CUP.fx.filter(f=>!f.done&&!cMine(f)).sort(()=>Math.random()-.5);
+  const rem=C_CUP.fx.filter(f=>!f.done&&cMine(f)).length;
+  const n=rem?Math.ceil(L.length/(rem+1)):L.length;
+  L.slice(0,n).forEach(f=>cSim(f,0));
+  if(C_CUP.fx.every(f=>f.done))cToKO();
+}
+function cToKO(){
+  const q=C_CUP.groups.map((_,gi)=>cStand(gi).slice(0,2).map(r=>r.t));
+  if(!q.flat().includes(C_CUP.me))C_CUP.exitStage='G';
+  C_CUP.stage='SF';
+  C_CUP.ko=[[q[0][0],q[1][1]],[q[1][0],q[0][1]]].map(([a,b])=>({a,b,done:0}));
+  cPlayOut();
+}
+function cPlayOut(){
+  for(;;){
+    C_CUP.ko.forEach(f=>{if(!f.done&&!cMine(f))cSim(f,1)});
+    if(C_CUP.ko.some(f=>!f.done))return;
+    const w=C_CUP.ko.map(f=>f.ga>f.gb?f.a:f.b);
+    if(C_CUP.stage==='F'){C_CUP.champ=w[0];return}
+    C_CUP.stage='F';
+    C_CUP.ko=[{a:w[0],b:w[1],done:0}];
+  }
+}
+
+function drawCosmicGauntletRival(){
+  if(!C_CUP||C_CUP.champ)return;
+  const rivals=C_CUP.pool.filter(b=>b!==C_CUP.me);
+  if(!rivals.length){C_CUP.champ=C_CUP.me;return}
+  C_CUP.nextOpp=rivals[Math.floor(Math.random()*rivals.length)];
+}
+function simCosmicGauntletOthers(){
+  const others=C_CUP.pool.filter(b=>b!==C_CUP.me&&b!==C_CUP.nextOpp).sort(()=>Math.random()-.5);
+  if(others.length<2)return;
+  const pairs=Math.max(1,Math.floor(others.length/2));
+  for(let i=0;i+1<pairs*2;i+=2){
+    const a=others[i],b=others[i+1];
+    let ga=Math.round(4+(C_CUP.str[a]-72)/8+rnd(0,5)),gb=Math.round(4+(C_CUP.str[b]-72)/8+rnd(0,5));
+    if(ga===gb)Math.random()<C_CUP.str[a]/(C_CUP.str[a]+C_CUP.str[b])?ga++:gb++;
+    const loser=ga>gb?b:a;
+    C_CUP.pool=C_CUP.pool.filter(x=>x!==loser);
+    C_CUP.history.unshift({a,b,ga,gb,user:false});
+  }
+}
+
+function cosmicHub(){
+  idle();
+  if(!C_CUP)return cosmicPicker('Earth');
+
+  // Grand Finale / Elimination Screen
+  if(C_CUP.champ){
+    const won=C_CUP.champ===C_CUP.me;
+    if(won&&!C_CUP.rewarded){C_CUP.rewarded=1;saveCosmic();addTrophy('cosmic');fanfare()}
+    const chObj=teamObj(C_CUP.champ);
+    open(`<div class="text-center py-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-300/45 text-[10.5px] font-black tracking-widest text-purple-200 mb-3">
+        🪐 SOLAR SYSTEM PLANETS & MOONS CHAMPIONSHIP
+      </div>
+      <div class="flex justify-center mb-3">${crestHTML(C_CUP.champ,'w-16 h-16 text-xl')}</div>
+      <h1 class="${H1} !text-3xl">${won?'🏆 '+C_CUP.me.toUpperCase()+' RULE THE SOLAR SYSTEM!':C_CUP.champ+' Win the Solar System Cup'}</h1>
+      <p class="${SUB} max-w-md mx-auto">${won
+        ?`From a village pit under Punjab's shade trees to the rings of Saturn and beyond — <b>${C_CUP.me}</b> (${chObj.sub}) are the undisputed <b>Solar System Kanche Champions</b>!`
+        :`<b>${C_CUP.me}</b> were eliminated in the <b>${C_CUP.exitStage==='M'?(C_CUP.homePlanet+' System Qualifiers'):(C_STG[C_CUP.exitStage]||C_CUP.exitStage)}</b>. <b>${C_CUP.champ}</b> conquered the cosmos!`}</p>
+    </div>
+    <button class="${BTN_COS}" data-act="cosmicReset">NEW SOLAR SYSTEM CHAMPIONSHIP</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+
+  // Format B: 33-Body Cosmic Gauntlet
+  if(C_CUP.format==='gauntlet'){
+    if(!C_CUP.nextOpp)drawCosmicGauntletRival();
+    const meT=teamObj(C_CUP.me),oppT=teamObj(C_CUP.nextOpp);
+    const pct=Math.round(((33-C_CUP.pool.length)/32)*100);
+    open(`<div class="flex items-center justify-between gap-2 mb-2">
+      <span class="px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-300/45 text-[10px] font-black tracking-widest text-purple-200">☄️ 33-BODY COSMIC GAUNTLET</span>
+      <span class="text-[11px] font-bold text-amber-200/80">${C_CUP.pool.length} / 33 Bodies Left</span>
+    </div>
+    <div class="w-full h-1.5 rounded-full bg-black/60 border border-white/10 overflow-hidden mb-3">
+      <div class="h-full bg-gradient-to-r from-purple-500 via-amber-300 to-sky-400" style="width:${Math.max(4,pct)}%"></div>
+    </div>
+    <div class="rounded-2xl border border-purple-300/40 bg-gradient-to-b from-black/65 to-purple-950/30 p-4 mb-3">
+      <div class="text-center text-[10px] font-extrabold uppercase tracking-[.22em] text-purple-200/80 mb-3">INTERPLANETARY RANDOM DRAW</div>
+      <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+        <div class="flex flex-col items-center">
+          ${crestHTML(C_CUP.me,'w-12 h-12 text-sm')}
+          <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${C_CUP.me}</div>
+          <div class="text-[10px] font-bold text-amber-300 mt-0.5">${meT.sub} · OVR ${C_CUP.str[C_CUP.me]}</div>
+        </div>
+        <div class="px-2"><div class="w-9 h-9 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-xs text-[#ffd479]">VS</div></div>
+        <div class="flex flex-col items-center">
+          ${crestHTML(C_CUP.nextOpp,'w-12 h-12 text-sm')}
+          <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${C_CUP.nextOpp}</div>
+          <div class="text-[10px] font-bold text-purple-300 mt-0.5">${oppT.sub} · OVR ${C_CUP.str[C_CUP.nextOpp]}</div>
+        </div>
+      </div>
+    </div>
+    <button class="${BTN_COS}" data-act="cosmicPlay">PLAY COSMIC MATCH (${meT.code3} vs ${oppT.code3})</button>
+    <button class="${GH}" data-act="cosmicReset">CHANGE PLANET / MOON</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+
+  // Format A — Stage 1: Planetary System Moon Qualifiers (e.g., Earth vs Moon, Saturn vs Titan/Enceladus...)
+  if(C_CUP.stage==='M'){
+    const opp=C_CUP.moonRivals[0];
+    const meT=teamObj(C_CUP.me),oppT=teamObj(opp);
+    const totalSys=C_CUP.sysContenders.length;
+    const doneSys=totalSys-C_CUP.moonRivals.length;
+    open(`<div class="flex items-center justify-between gap-2 mb-2">
+      <span class="px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-300/45 text-[10px] font-black tracking-widest text-purple-200">🌙 ${C_CUP.homePlanet.toUpperCase()} SYSTEM QUALIFIER</span>
+      <span class="text-[11px] font-bold text-[#ffd479]">${C_CUP.moonRivals.length} Moon Rival${C_CUP.moonRivals.length>1?'s':''} Left</span>
+    </div>
+    <p class="${SUB}">Defeat all moons in the <b>${C_CUP.homePlanet}</b> system (${doneSys}/${totalSys-1} cleared) to claim the Planetary Crown and advance to the <b>8-Planet Interplanetary Finals</b>!</p>
+    <div class="rounded-2xl border border-purple-300/40 bg-gradient-to-b from-black/65 to-purple-950/30 p-4 mb-3">
+      <div class="text-center text-[10px] font-extrabold uppercase tracking-[.22em] text-purple-200/80 mb-3">${C_CUP.homePlanet.toUpperCase()} ORBITAL SHOWDOWN</div>
+      <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+        <div class="flex flex-col items-center">
+          ${crestHTML(C_CUP.me,'w-12 h-12 text-sm')}
+          <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${C_CUP.me}</div>
+          <div class="text-[10px] font-bold text-amber-300 mt-0.5">${meT.sub} · OVR ${C_CUP.str[C_CUP.me]}</div>
+        </div>
+        <div class="px-2"><div class="w-9 h-9 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-xs text-[#ffd479]">VS</div></div>
+        <div class="flex flex-col items-center">
+          ${crestHTML(opp,'w-12 h-12 text-sm')}
+          <div class="font-black text-[14px] text-white mt-1.5 leading-tight">${opp}</div>
+          <div class="text-[10px] font-bold text-sky-300 mt-0.5">${oppT.sub} · OVR ${C_CUP.str[opp]}</div>
+        </div>
+      </div>
+    </div>
+    ${C_CUP.moonHistory.length?`<div class="space-y-1 mb-2.5">
+      ${C_CUP.moonHistory.map(m=>`<div class="flex justify-between px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/25 text-[11.5px] font-bold text-emerald-200"><span>✓ ${m.a}</span><span>${m.ga} – ${m.gb}</span><span>${m.b}</span></div>`).join('')}
+    </div>`:''}
+    <button class="${BTN_COS}" data-act="cosmicPlay">PLAY ORBITAL MATCH (${meT.code3} vs ${oppT.code3})</button>
+    <button class="${GH}" data-act="cosmicReset">CHANGE PLANET / MOON</button>
+    <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+    return;
+  }
+
+  // Format A — Stage 2: 8-Planet Interplanetary Championship (Group A: Inner Rockys vs Group B: Outer Giants + Knockouts)
+  const nx=(C_CUP.stage==='G'?C_CUP.fx:C_CUP.ko).find(f=>!f.done&&cMine(f));
+  const opp=nx.a===C_CUP.me?nx.b:nx.a;
+  const meT=teamObj(C_CUP.me),oppT=teamObj(opp);
+  const groupTitle=C_CUP.gi===0?'GROUP A · INNER SOLAR SYSTEM':'GROUP B · OUTER GAS & ICE GIANTS';
+
+  const stageBody=C_CUP.stage==='G'
+    ?`<div class="flex items-center justify-between mt-2 mb-1.5">
+        <span class="text-[10.5px] font-black tracking-widest uppercase text-[#ffd479]">${groupTitle}</span>
+        <span class="text-[10px] text-emerald-300 font-bold">Top 2 Advance to Semi-Finals</span>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-black/45 overflow-hidden mb-3">
+        <table class="w-full text-[12px] text-[#d3be94]">
+          <thead class="bg-white/5 text-[9.5px] uppercase text-amber-200/70">
+            <tr><th class="text-left py-1.5 px-2.5">Celestial Rep</th><th class="py-1.5 px-1.5">MP</th><th class="py-1.5 px-1.5">W-D-L</th><th class="py-1.5 px-1.5">MD</th><th class="py-1.5 px-2.5 text-right">PTS</th></tr>
+          </thead>
+          <tbody>
+            ${cStand(C_CUP.gi).map((r,i)=>`<tr class="border-t border-white/5 ${r.t===C_CUP.me?'bg-purple-500/20 text-white font-extrabold':''} ${i<2?'border-l-2 border-l-emerald-400':'opacity-75'}">
+              <td class="py-1.5 px-2.5 flex items-center gap-1.5">${crestHTML(r.t,'w-5 h-5 text-[8px]')}<span class="truncate max-w-[130px]">${r.t}</span></td>
+              <td class="text-center py-1.5">${r.p}</td>
+              <td class="text-center py-1.5 text-[11px]">${r.w}-${r.d}-${r.l}</td>
+              <td class="text-center py-1.5">${r.gd>0?'+'+r.gd:r.gd}</td>
+              <td class="text-right py-1.5 px-2.5 font-black text-[#ffd479]">${r.pt}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`
+    :`<h2 class="${H2} !mt-2">${C_STG[C_CUP.stage]}</h2>
+      <div class="space-y-1.5 mb-3">
+        ${C_CUP.ko.map(f=>`<div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl border ${cMine(f)?'border-purple-300/60 bg-purple-500/20 text-white font-bold':'border-white/10 bg-white/5 text-[#d3be94]'} text-[12px]">
+          <span class="flex items-center gap-1.5 truncate flex-1">${crestHTML(f.a,'w-5 h-5 text-[8px]')}<span class="truncate">${f.a}</span></span>
+          <span class="px-2 py-0.5 rounded bg-black/55 text-[#ffd479] font-black">${f.done?f.ga+' – '+f.gb+(f.pen?'*':''):'VS'}</span>
+          <span class="flex items-center justify-end gap-1.5 truncate flex-1"><span class="truncate">${f.b}</span>${crestHTML(f.b,'w-5 h-5 text-[8px]')}</span>
+        </div>`).join('')}
+      </div>`;
+
+  open(`<div class="flex items-center justify-between mb-2">
+    <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-300/45 text-[10px] font-black tracking-widest text-purple-200">🪐 ${C_STG[C_CUP.stage].toUpperCase()}</span>
+    <span class="text-[11px] font-bold text-[#ffd479]">${meT.code3}</span>
+  </div>
+  ${stageBody}
+  <div class="rounded-2xl border border-purple-300/40 bg-gradient-to-b from-black/65 to-purple-950/30 p-3.5 mb-2">
+    <div class="text-center text-[9.5px] font-extrabold uppercase tracking-[.22em] text-purple-200/80 mb-2.5">NEXT INTERPLANETARY FIXTURE</div>
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+      <div class="flex flex-col items-center">
+        ${crestHTML(C_CUP.me,'w-11 h-11 text-xs')}
+        <div class="font-black text-[13.5px] text-white mt-1 leading-tight">${C_CUP.me}</div>
+        <div class="text-[10px] font-bold text-amber-300">${meT.sub} · ${C_CUP.str[C_CUP.me]}</div>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-white/10 border border-amber-200/30 flex items-center justify-center font-black text-[11px] text-[#ffd479]">VS</div>
+      <div class="flex flex-col items-center">
+        ${crestHTML(opp,'w-11 h-11 text-xs')}
+        <div class="font-black text-[13.5px] text-white mt-1 leading-tight">${opp}</div>
+        <div class="text-[10px] font-bold text-sky-300">${oppT.sub} · ${C_CUP.str[opp]}</div>
+      </div>
+    </div>
+  </div>
+  <button class="${BTN_COS}" data-act="cosmicPlay">LAUNCH COSMIC MATCH (${meT.code3} vs ${oppT.code3})</button>
+  <button class="${GH}" data-act="cosmicReset">CHANGE PLANET / NEW COSMIC CUP</button>
+  <button class="${GH}" data-act="setup">MAIN MENU</button>`);
+}
+
+function cosmicPlay(){
+  if(!C_CUP)return;
+  if(C_CUP.format==='gauntlet'){
+    const opp=C_CUP.nextOpp;
+    C_CUP.live=1;
+    AIQ=cl((106-C_CUP.str[opp])/34,.38,1.5);
+    start([C_CUP.me,opp],'cosmic');
+    return;
+  }
+  if(C_CUP.stage==='M'){
+    const opp=C_CUP.moonRivals[0];
+    C_CUP.live=1;
+    AIQ=cl((106-C_CUP.str[opp])/34,.42,1.55);
+    start([C_CUP.me,opp],'cosmic');
+    return;
+  }
+  const f=(C_CUP.stage==='G'?C_CUP.fx:C_CUP.ko).find(f=>!f.done&&cMine(f));
+  const opp=f.a===C_CUP.me?f.b:f.a;
+  C_CUP.cur=f;C_CUP.live=1;
+  AIQ=cl((106-C_CUP.str[opp])/34,.38,1.5);
+  start([C_CUP.me,opp],'cosmic');
+}
+
+function cosmicResult(){
+  C_CUP.live=0;
+  let hh=S.players[0].marbles,oo=S.players[1].marbles,pen=0;
+
+  if(C_CUP.format==='gauntlet'){
+    const opp=C_CUP.nextOpp;
+    if(hh===oo){pen=1;Math.random()<.52?hh++:oo++}
+    C_CUP.history.unshift({a:C_CUP.me,b:opp,ga:hh,gb:oo,user:true});
+    if(hh>oo){
+      C_CUP.pool=C_CUP.pool.filter(x=>x!==opp);
+      C_CUP.str[C_CUP.me]=Math.min(99,C_CUP.str[C_CUP.me]+1);
+      simCosmicGauntletOthers();
+      C_CUP.nextOpp=null;drawCosmicGauntletRival();saveCosmic();
+      const isChamp=C_CUP.champ===C_CUP.me;
+      open(`<h1 class="${H1}">${isChamp?'🏆 SOLAR SYSTEM RULER!':'Cosmic Victory! 🪐'}</h1>`+
+      para(`<b>${C_CUP.me} ${hh} – ${oo} ${opp}</b>${pen?' (Golden Toss)':''}<br>${isChamp?`<b>${C_CUP.me}</b> conquered all 33 celestial bodies!`:`Next random celestial opponent: <b>${C_CUP.nextOpp}</b> (${C_CUP.pool.length} left).`}`)+
+      `<button class="${BTN_COS}" data-act="cosmicHub">${isChamp?'CLAIM COSMIC TROPHY':'NEXT CELESTIAL BODY'}</button>`);
+    }else{
+      C_CUP.exitStage='33-Body Gauntlet';
+      while(C_CUP.pool.length>1){
+        C_CUP.pool.sort(()=>Math.random()-.5);
+        const a=C_CUP.pool[0],b=C_CUP.pool[1];
+        C_CUP.pool=C_CUP.pool.filter(x=>x!==(C_CUP.str[a]+rnd(0,10)>C_CUP.str[b]+rnd(0,10)?b:a));
+      }
+      C_CUP.champ=C_CUP.pool[0];saveCosmic();
+      open(`<h1 class="${H1}">Cosmic Elimination</h1>`+para(`<b>${C_CUP.me} ${hh} – ${oo} ${opp}</b><br><b>${C_CUP.champ}</b> won the Solar System Cup.`)+`<button class="${BTN}" data-act="cosmicHub">VIEW SUMMARY</button>`);
+    }
+    return;
+  }
+
+  // Stage 1: Moon System Qualifier Result
+  if(C_CUP.stage==='M'){
+    const opp=C_CUP.moonRivals[0];
+    if(hh===oo){pen=1;Math.random()<.52?hh++:oo++}
+    if(hh>oo){
+      C_CUP.moonHistory.push({a:C_CUP.me,b:opp,ga:hh,gb:oo});
+      C_CUP.moonRivals.shift();
+      const clearedAllMoons=C_CUP.moonRivals.length===0;
+      if(clearedAllMoons)initInterplanetaryStage();
+      saveCosmic();
+      open(`<h1 class="${H1}">${clearedAllMoons?'👑 '+C_CUP.homePlanet+' System Champion!':'Orbital Victory! 🌙'}</h1>`+
+      para(`<b>${C_CUP.me} ${hh} – ${oo} ${opp}</b>${pen?' (Golden Toss)':''}<br>${clearedAllMoons
+        ?`All moons in the <b>${C_CUP.homePlanet}</b> system defeated! You now advance to the <b>8-Planet Interplanetary Finals</b>!`
+        :`Next moon challenger in ${C_CUP.homePlanet} orbit: <b>${C_CUP.moonRivals[0]}</b>.`}`)+
+      `<button class="${BTN_COS}" data-act="cosmicHub">${clearedAllMoons?'ENTER 8-PLANET FINALS':'NEXT MOON CHALLENGER'}</button>`);
+    }else{
+      C_CUP.exitStage='M';
+      C_CUP.champ=opp;
+      saveCosmic();
+      open(`<h1 class="${H1}">Upset in ${C_CUP.homePlanet} Orbit!</h1>`+para(`<b>${C_CUP.me} ${hh} – ${oo} ${opp}</b><br><b>${opp}</b> claimed the ${C_CUP.homePlanet} system crown.`)+`<button class="${BTN}" data-act="cosmicHub">VIEW SUMMARY</button>`);
+    }
+    return;
+  }
+
+  // Stage 2: 8-Planet Interplanetary Group / Knockout Result
+  const f=C_CUP.cur,ko=C_CUP.stage!=='G',isA=f.a===C_CUP.me;
+  if(ko&&hh===oo){pen=1;Math.random()<.52?hh++:oo++}
+  cFin(f,isA?hh:oo,isA?oo:hh,pen);
+  if(!ko)cBatch();
+  else{
+    if(hh<oo)C_CUP.exitStage=C_CUP.stage;
+    cPlayOut();
+  }
+  saveCosmic();
+  const oppName=isA?f.b:f.a;
+  open(`<h1 class="${H1}">${hh>oo?'Interplanetary Win! 🪐':hh<oo?'Defeat':'Draw'}</h1>`+
+  para(`${C_CUP.me} <b>${hh}</b> – <b>${oo}</b> ${oppName}${pen?'<br>Level after four rounds — decided by golden toss.':''}`)+
+  `<button class="${BTN_COS}" data-act="cosmicHub">CONTINUE COSMIC CUP</button>`);
+}
+
+function cosmicCup(){if(!C_CUP)try{C_CUP=JSON.parse(localStorage.getItem('kanche-cosmic'))}catch(e){C_CUP=null}C_CUP?(C_CUP.live=0,cosmicHub()):cosmicPicker('Earth')}
+function cosmicReset(){try{localStorage.removeItem('kanche-cosmic')}catch(e){}cosmicPicker('Earth')}
+function promoteEarth(){cFormat='system';const earIdx=COSMIC_BODIES.findIndex(b=>b.name==='Earth');newCosmicCup(earIdx>=0?earIdx:2)}
+
+$('#panel')
+  .on('click','.cfmt',function(){
+    cFormat=$(this).data('cfmt');
+    $('.cfmt').removeClass('border-purple-300 bg-purple-500/20 border-sky-300 bg-sky-400/20 text-white').addClass('border-white/10 bg-white/5 text-amber-100/75');
+    $(this).removeClass('border-white/10 bg-white/5 text-amber-100/75').addClass(cFormat==='system'?'border-purple-300 bg-purple-500/20 text-white':'border-sky-300 bg-sky-400/20 text-white');
+  })
+  .on('click','.cflt',function(){
+    cFilter=$(this).data('cfl');
+    $('.cflt').removeClass('border-purple-300 bg-purple-500/25 text-purple-200').addClass('border-white/10 bg-white/5 text-amber-100/70');
+    $(this).removeClass('border-white/10 bg-white/5 text-amber-100/70').addClass('border-purple-300 bg-purple-500/25 text-purple-200');
+    renderCosmicGrid();
+  })
+  .on('click','[data-cbi]',function(){newCosmicCup(+$(this).data('cbi'))});
+
+$('#panel')
+  .on('input','#wSearch',function(){wSearchQuery=this.value;renderWorldCountryGrid()})
+  .on('click','.wconf',function(){
+    wFilterConf=$(this).data('cf');
+    $('.wconf').removeClass('border-[#ffd479] bg-amber-400/20 text-[#ffd479]').addClass('border-white/10 bg-white/5 text-amber-100/70');
+    $(this).removeClass('border-white/10 bg-white/5 text-amber-100/70').addClass('border-[#ffd479] bg-amber-400/20 text-[#ffd479]');
+    renderWorldCountryGrid();
+  })
+  .on('click','.wfmt',function(){
+    wFormat=$(this).data('fmt');
+    $('.wfmt').removeClass('border-[#ffd479] bg-amber-400/20 border-sky-300 bg-sky-400/20 text-white').addClass('border-white/10 bg-white/5 text-amber-100/75');
+    $(this).removeClass('border-white/10 bg-white/5 text-amber-100/75').addClass(wFormat==='fifa'?'border-[#ffd479] bg-amber-400/20 text-white':'border-sky-300 bg-sky-400/20 text-white');
+  })
+  .on('click','[data-ci]',function(){newWorldCup(+$(this).data('ci'))});
+
+/* ---------- Global Event Wiring ---------- */
+$('#panel').on('input','#nm',function(){cfg.name=this.value.replace(/[<>&"']/g,'')});
+$('#panel').on('click','.opt',function(){const r=$(this).parent();cfg[r.data('k')]=+$(this).data('v');r.children().removeClass('sel');$(this).addClass('sel');potTxt()})
+ .on('click','[data-act]',function(){
+   const act=$(this).data('act');
+   const map={
+     setup,rules,start:()=>start(),
+     cup,cupPlay,cupReset,cupHub,promotePunjab,
+     natCup,natPlay,natReset,natHub,promoteIndia,
+     worldCup,worldPlay,worldReset,worldHub,promoteEarth,
+     cosmicCup,cosmicPlay,cosmicReset,cosmicHub,
+     back:()=>backFn?backFn():close()
+   };
+   if(map[act])map[act]();
+ });
+$('#help').on('click',()=>{if(S.phase==='setup'||S.phase==='over')return;backFn=close;rules()});
+
+/* ---------- Main Animation Loop ---------- */
+let last=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(now-last)/1000);
+  physics(dt);last=now;
+  animKids(now/1000,dt);
+  radar();
+
+  const t=now*.001;
+  for(let i=0;i<canopies.length;i++){
+    const c=canopies[i];
+    c.crown.rotation.z=Math.sin(t*1.1+c.ph)*.025;
+    c.crown.rotation.x=Math.cos(t*.9+c.ph)*.02;
+  }
+  const dp=dustGeo.attributes.position.array;
+  for(let i=0;i<dustCount;i++){
+    dp[i*3+1]+=Math.sin(t+i)*.0015;
+    dp[i*3]+=Math.cos(t*.7+i)*.0015;
+  }
+  dustGeo.attributes.position.needsUpdate=true;
+
+  const sh=S.phase==='shooting'&&S.shot;
+  look.lerp(sh?S.shot.pos:lookBase,sh?.07:.04);
+  cam.position.set(camBase.x+Math.sin(now*3e-4)*.18,camBase.y+Math.sin(now*4e-4)*.06,camBase.z);
+  cam.lookAt(look);
+  if(fovK>.01){fovK*=.94;cam.fov=42-6*fovK;cam.updateProjectionMatrix()}
+  if(S.phase==='aim')guide();
+  if(selRing.visible){selRing.material.opacity=.55+Math.sin(now*.006)*.35;selRing.scale.setScalar(1+Math.sin(now*.006)*.08)}
+  ren.render(scene,cam);
+}
+addEventListener('resize',()=>{ren.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();fitCamera()});
+addEventListener('orientationchange',()=>setTimeout(()=>dispatchEvent(new Event('resize')),120));
+document.addEventListener('gesturestart',e=>e.preventDefault());
+
+buildGround();buildVillage(6);fitCamera();hud();story();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
